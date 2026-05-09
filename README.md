@@ -42,10 +42,10 @@ This project was developed as part of the UW Lean Hackathon.
 
 ### Core Team
 
-- **John Ye** — [GitHub](https://github.com/yezhuoyang)
+- **John Ye** — [GitHub](https://github.com/yezhuoyang) | [Website](https://yezhuoyang.github.io/)
 - **Nicholas Mundy** - [GitHub](https://github.com/nmmundy)
-- **Kieran Rullman** - [GitHub](https://github.com/kieranrullman)
-- **Owen Parks** - [GitHub](https://github.com/oe-parks) [Website](https://owenparks.com)
+- **Kieran Rullman** - [GitHub](https://github.com/kieranrullman) 
+- **Owen Parks** - [GitHub](https://github.com/oe-parks) | [Website](https://owenparks.com)
 
 ## TODO List
 
