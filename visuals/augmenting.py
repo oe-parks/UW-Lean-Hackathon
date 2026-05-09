@@ -132,11 +132,13 @@ FINAL_MATCHING = [(1, 4), (0, 5), (2, 3), (6, 7)]
 C_BG        = "#ffffff"
 C_NODE      = "#4a90d9"
 C_MATCHED   = "#2ecc71"
-C_PATH_FREE = "#000000"
+C_PATH_FREE = "#f0a500"
 C_PATH_MAT  = "#e74c3c"
 C_EDGE      = "#000000"
 C_TEXT      = "#000000"
 C_DIM       = "#000000"
+C_NODE_LABEL = "#000000"
+C_NODE_LABEL_ON_DARK = "#ffffff"
 
 # ╔══════════════════════════════════════════════════════════════════════════════╗
 # ║               ANIMATION ENGINE — no need to edit below here                 ║
@@ -155,7 +157,7 @@ class AugmentingPath(Scene):
         c = Circle(radius=0.30, color=C_NODE, fill_color=C_NODE,
                    fill_opacity=1, stroke_width=0)
         c.move_to(pos)
-        lbl = Text(str(n), font_size=20, color=C_TEXT, weight=BOLD)
+        lbl = Text(str(n), font_size=20, color=C_NODE_LABEL, weight=BOLD)
         lbl.move_to(pos)
         return VGroup(c, lbl)
 
@@ -170,6 +172,17 @@ class AugmentingPath(Scene):
     def recolor_node(self, node_mob, color):
         node_mob[0].set_fill(color, opacity=1)
         node_mob[0].set_stroke(color, width=0)
+        node_mob[1].set_color(self.node_label_color(color))
+
+    def node_label_color(self, color):
+        hex_color = str(color).lstrip("#")
+        if len(hex_color) == 6:
+            r = int(hex_color[0:2], 16)
+            g = int(hex_color[2:4], 16)
+            b = int(hex_color[4:6], 16)
+            if 0.2126 * r + 0.7152 * g + 0.0722 * b <= 40:
+                return C_NODE_LABEL_ON_DARK
+        return C_NODE_LABEL
 
     def flash_edge(self, edge_mob, color):
         return ShowPassingFlash(
@@ -217,11 +230,11 @@ class AugmentingPath(Scene):
                 run_time=0.5,
             )
 
-    def _leg(self, label, color):
-        dot = Circle(radius=0.09, color=color, fill_color=color,
-                     fill_opacity=1, stroke_width=0)
+    def _leg(self, label, color, stroke_width=4):
+        sample = Line(LEFT * 0.18, RIGHT * 0.18, color=color,
+                      stroke_width=stroke_width)
         txt = Text(label, font_size=14, color=C_DIM)
-        return VGroup(dot, txt).arrange(RIGHT, buff=0.15)
+        return VGroup(sample, txt).arrange(RIGHT, buff=0.15)
 
     def construct(self):
         nodes = {n: self.make_node(n) for n in NODE_POSITIONS}
@@ -240,10 +253,10 @@ class AugmentingPath(Scene):
         self.wait(0.6)
 
         leg = VGroup(
-            self._leg("Unmatched edge",       C_EDGE),
-            self._leg("Matched edge",         C_MATCHED),
-            self._leg("Free edge on path",    C_PATH_FREE),
-            self._leg("Matched edge on path", C_PATH_MAT),
+            self._leg("Unmatched edge",       C_EDGE, 2.5),
+            self._leg("Matched edge",         C_MATCHED, 4),
+            self._leg("Free edge on path",    C_PATH_FREE, 5),
+            self._leg("Matched edge on path", C_PATH_MAT, 5),
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.18)
         leg.to_corner(DR, buff=0.35)
         leg_bg = SurroundingRectangle(
