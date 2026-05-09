@@ -129,14 +129,14 @@ AUGMENTATION_STEPS = [
 FINAL_MATCHING = [(1, 4), (0, 5), (2, 3), (6, 7)]
 
 # ── 5. COLORS (optional — change to restyle) ──────────────────────────────────
-C_BG        = "#0d1117"
+C_BG        = "#ffffff"
 C_NODE      = "#4a90d9"
 C_MATCHED   = "#2ecc71"
-C_PATH_FREE = "#f0a500"
+C_PATH_FREE = "#000000"
 C_PATH_MAT  = "#e74c3c"
-C_EDGE      = "#3a3f4b"
-C_TEXT      = "#e6edf3"
-C_DIM       = "#8b949e"
+C_EDGE      = "#000000"
+C_TEXT      = "#000000"
+C_DIM       = "#000000"
 
 # ╔══════════════════════════════════════════════════════════════════════════════╗
 # ║               ANIMATION ENGINE — no need to edit below here                 ║
@@ -155,7 +155,7 @@ class AugmentingPath(Scene):
         c = Circle(radius=0.30, color=C_NODE, fill_color=C_NODE,
                    fill_opacity=1, stroke_width=0)
         c.move_to(pos)
-        lbl = Text(str(n), font_size=20, color=C_BG, weight=BOLD)
+        lbl = Text(str(n), font_size=20, color=C_TEXT, weight=BOLD)
         lbl.move_to(pos)
         return VGroup(c, lbl)
 
@@ -247,7 +247,7 @@ class AugmentingPath(Scene):
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.18)
         leg.to_corner(DR, buff=0.35)
         leg_bg = SurroundingRectangle(
-            leg, color="#21262d", fill_color="#161b22",
+            leg, color="#cccccc", fill_color="#ffffff",
             fill_opacity=0.92, corner_radius=0.1, buff=0.15,
         )
         self.play(FadeIn(leg_bg), FadeIn(leg))
