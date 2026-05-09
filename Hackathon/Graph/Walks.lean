@@ -1,4 +1,7 @@
-import Mathlib.Combinatorics.SimpleGraph.Walk
+/-import Mathlib.Combinatorics.SimpleGraph.Walk
+-/
+import Mathlib.Combinatorics.SimpleGraph.Init
+import Mathlib.Data.Sym.Sym2
 import Mathlib.Combinatorics.SimpleGraph.Paths
 
 /-
@@ -22,23 +25,27 @@ variable {V : Type*} {G : SimpleGraph V}
 /-- ★  The reverse of a `nil` walk is `nil`. -/
 example (v : V) : (Walk.nil : G.Walk v v).reverse = Walk.nil := by
   -- HINT: `simp` with `Walk.reverse_nil`.
-  sorry
+    simp[Walk.reverse_nil]
+
+
 
 /-- ★  A walk and its reverse have the same length. -/
 example {u v : V} (p : G.Walk u v) : p.reverse.length = p.length := by
   -- HINT: `Walk.length_reverse`.
-  sorry
+    simp[Walk.length_reverse]
 
 /-- ★★  Concatenating a walk with `nil` does not change its length. -/
 example {u v : V} (p : G.Walk u v) : (p.append Walk.nil).length = p.length := by
   -- HINT: induction on `p`, or use `Walk.append_nil` + `simp`.
-  sorry
+  induction p with
+  | nil => simp
+  | cons h p ih => simp
 
 /-- ★★  Length of `append` is the sum of lengths. -/
 example {u v w : V} (p : G.Walk u v) (q : G.Walk v w) :
     (p.append q).length = p.length + q.length := by
   -- HINT: `Walk.length_append`.
-  sorry
+    simp[Walk.length_append]
 
 /- ## Paths -/
 
@@ -47,12 +54,13 @@ example {u v : V} (p : G.Path u v) : G.Walk u v := p.val
 
 /-- ★★  A walk of length 0 from `u` to `v` forces `u = v`. -/
 example {u v : V} (p : G.Walk u v) (h : p.length = 0) : u = v := by
-  -- HINT: `cases p`. The `cons` case has `length ≥ 1`, contradicting `h`.
-  sorry
+  cases p
+  · rfl
+  · simp at h
 
 /-- ★★★  If `p : G.Walk u v` is a path, so is `p.reverse`. -/
 example {u v : V} (p : G.Walk u v) (hp : p.IsPath) : p.reverse.IsPath := by
   -- HINT: `Walk.IsPath.reverse`.
-  sorry
+  exact hp.reverse
 
 end Hackathon
