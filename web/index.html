@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Edmonds' Blossom — step-by-step matching visualizer</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/cytoscape@3.30.0/dist/cytoscape.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Edmonds' blossom algorithm</h1>
+    <div class="modeBar">
+      <button id="modeEdit" class="active">Edit</button>
+      <button id="modeRun">Run</button>
+      <span class="sep"></span>
+      <label>Preset:
+        <select id="presetSelect">
+          <option value="">— choose —</option>
+        </select>
+      </label>
+      <button id="clearBtn">Clear</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="canvasWrap">
+      <div id="cy"></div>
+      <div id="legend">
+        <div><span class="dot vMatched"></span> matched vertex</div>
+        <div><span class="dot vExposed"></span> unmatched (exposed)</div>
+        <div><span class="dot vForestEven"></span> forest, even level</div>
+        <div><span class="dot vForestOdd"></span> forest, odd level</div>
+        <div><span class="line eMatching"></span> matching edge</div>
+        <div><span class="line eForest"></span> forest edge</div>
+        <div><span class="line eAugment"></span> augmenting path</div>
+        <div><span class="ring blossom"></span> contracted blossom</div>
+      </div>
+    </div>
+
+    <aside id="sidebar">
+      <section id="editorPanel">
+        <h2>Edit graph</h2>
+        <p class="hint">
+          Click empty space to add a vertex. Click two vertices in turn to
+          toggle an edge. Right-click (or shift-click) a vertex to delete it.
+          <span id="vCount">0</span>/<span id="vCap">30</span> vertices.
+        </p>
+        <details>
+          <summary>Import / export JSON</summary>
+          <textarea id="jsonArea" rows="6" placeholder='{"vertices":[0,1,2],"edges":[[0,1],[1,2]]}'></textarea>
+          <div class="row">
+            <button id="jsonImport">Import</button>
+            <button id="jsonExport">Export</button>
+          </div>
+        </details>
+      </section>
+
+      <section id="runPanel" hidden>
+        <h2>Run</h2>
+        <div class="row">
+          <button id="runBuild">Build trace</button>
+          <button id="runReset">Reset</button>
+        </div>
+        <div class="row">
+          <button id="stepBack">⏮</button>
+          <button id="stepPrev">◀</button>
+          <button id="playBtn">▶ Play</button>
+          <button id="stepNext">▶</button>
+          <button id="stepEnd">⏭</button>
+        </div>
+        <div class="row">
+          <label>Speed:
+            <input type="range" id="speed" min="100" max="2000" step="50" value="700" />
+            <span id="speedLabel">700 ms</span>
+          </label>
+        </div>
+        <div class="row">
+          <progress id="progress" value="0" max="1"></progress>
+          <span id="progressLabel">0 / 0</span>
+        </div>
+        <div id="status"></div>
+        <h3>Event log</h3>
+        <ol id="log"></ol>
+      </section>
+
+      <section id="resultPanel" hidden>
+        <h2>Verifier</h2>
+        <div id="verifierOut"></div>
+      </section>
+    </aside>
+  </main>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
