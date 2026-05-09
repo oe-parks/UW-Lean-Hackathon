@@ -22,13 +22,13 @@ variable {V : Type u}
 def toSimpleGraph (G : Graph V) : SimpleGraph V where
   Adj := G.edge
   symm _ _ h := G.edge_symm h
-  loopless v h := G.edge_irrefl v h
+  loopless := ⟨G.edge_irrefl⟩
 
 /-- Convert a Mathlib `SimpleGraph` to a toy `Graph`. -/
 def ofSimpleGraph (G : SimpleGraph V) : Graph V where
   edge := G.Adj
   edge_symm h := G.symm h
-  edge_irrefl v h := G.loopless v h
+  edge_irrefl v h := G.loopless.irrefl v h
 
 /-- The two conversions are mutually inverse (one direction). -/
 @[simp] theorem toSimpleGraph_ofSimpleGraph (G : SimpleGraph V) :

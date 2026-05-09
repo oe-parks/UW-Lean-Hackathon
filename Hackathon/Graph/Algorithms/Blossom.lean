@@ -47,7 +47,7 @@ Each of these is a substantial theorem. We leave them as `sorry`s here
 and treat partial progress as Phase 3 / future work.
 -/
 
-namespace Hackathon.Blossom
+namespace Hackathon.Edmonds
 
 open SimpleGraph
 
@@ -80,4 +80,4 @@ theorem edmonds_finds_augmenting
     ∃ (u v : V) (w : G.Walk u v), Hackathon.IsAugmenting M w := by
   sorry
 
-end Hackathon.Blossom
+end Hackathon.Edmonds
