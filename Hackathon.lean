@@ -15,3 +15,13 @@ import Hackathon.Graph.Augment
 import Hackathon.Graph.Berge
 import Hackathon.Graph.Algorithms.Bipartite
 import Hackathon.Graph.Algorithms.Blossom
+
+-- Toy graph layer: matchings, walks, alternating + augmenting paths.
+import Hackathon.Graph.Toy.Matching
+import Hackathon.Graph.Toy.Walk
+
+-- Exercises: concrete graphs + a worked example + sorry-stubs to fill in.
+import Hackathon.Exercises.Graphs
+import Hackathon.Exercises.Worked
+import Hackathon.Exercises.Matchings
+import Hackathon.Exercises.Augmenting
