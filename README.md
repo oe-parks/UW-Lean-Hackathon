@@ -1,4 +1,4 @@
-# hackathon
+# Hackathon
 
 Solution submitted by **XXX Team** for the **UW Lean Hackathon**.
 
@@ -28,7 +28,7 @@ We formalize graph theory from the ground up in Lean 4. We start by defining the
 
 On top of that foundation, we design a small toy language: we give it an explicit syntax and a sound operational semantics tailored to expressing the blossom algorithm. We then implement Edmonds' blossom algorithm in that language and verify its correctness in Lean.
 
-![Augmenting Path Discovery](augmenting_path_manim.gif)
+![Augmenting Path Discovery](visuals/augmenting_path_manim.gif)
 
 ## Optimization
 
