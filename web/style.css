@@ -1,0 +1,154 @@
+:root {
+  --bg: #0e1116;
+  --panel: #161b22;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --good: #3fb950;
+  --warn: #d29922;
+  --bad: #f85149;
+
+  --vExposed: #f0883e;
+  --vMatched: #58a6ff;
+  --vForestEven: #3fb950;
+  --vForestOdd: #d29922;
+  --eMatching: #58a6ff;
+  --eForest: #d29922;
+  --eAugment: #f85149;
+  --blossom: #bc8cff;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.4 system-ui, -apple-system, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+header h1 { font-size: 16px; margin: 0; }
+.modeBar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.modeBar .sep { width: 1px; height: 18px; background: var(--border); margin: 0 4px; }
+
+button, select, input[type="text"], textarea {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font: inherit;
+  cursor: pointer;
+}
+button:hover { border-color: var(--accent); }
+button.active { border-color: var(--accent); color: var(--accent); }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  min-height: 0;
+}
+
+#canvasWrap {
+  position: relative;
+  border-right: 1px solid var(--border);
+  min-height: 0;
+}
+#cy {
+  position: absolute;
+  inset: 0;
+}
+
+#legend {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(22, 27, 34, 0.85);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  display: grid;
+  gap: 4px;
+}
+#legend .dot { display:inline-block; width:10px; height:10px; border-radius:50%; vertical-align:middle; margin-right:6px; }
+#legend .line { display:inline-block; width:18px; height:3px; vertical-align:middle; margin-right:6px; }
+#legend .ring { display:inline-block; width:14px; height:14px; border:2px solid var(--blossom); border-radius:50%; vertical-align:middle; margin-right:6px; }
+.dot.vExposed   { background: var(--vExposed); }
+.dot.vMatched   { background: var(--vMatched); }
+.dot.vForestEven { background: var(--vForestEven); }
+.dot.vForestOdd  { background: var(--vForestOdd); }
+.line.eMatching { background: var(--eMatching); }
+.line.eForest   { background: var(--eForest); }
+.line.eAugment  { background: var(--eAugment); }
+
+#sidebar {
+  padding: 12px 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+#sidebar h2 { font-size: 14px; margin: 0 0 6px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+#sidebar h3 { font-size: 13px; margin: 8px 0 4px; color: var(--muted); }
+.hint { color: var(--muted); margin: 0 0 8px; }
+.row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 6px; }
+textarea { width: 100%; resize: vertical; font: 12px ui-monospace, monospace; }
+
+progress {
+  flex: 1;
+  height: 8px;
+}
+progress::-webkit-progress-bar { background: var(--panel); border-radius: 4px; }
+progress::-webkit-progress-value { background: var(--accent); border-radius: 4px; }
+
+#status {
+  margin: 6px 0;
+  padding: 6px 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 13px;
+  min-height: 20px;
+}
+
+#log {
+  max-height: 280px;
+  overflow-y: auto;
+  font-size: 12px;
+  font-family: ui-monospace, monospace;
+  padding: 0 0 0 24px;
+  margin: 0;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+#log li {
+  padding: 2px 4px;
+  border-bottom: 1px solid var(--border);
+}
+#log li.current { background: rgba(88, 166, 255, 0.15); color: var(--accent); }
+#log li:last-child { border-bottom: none; }
+
+#verifierOut {
+  padding: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 13px;
+}
+#verifierOut.ok { border-color: var(--good); }
+#verifierOut.bad { border-color: var(--bad); }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; }
+.kv span:nth-child(odd) { color: var(--muted); }
