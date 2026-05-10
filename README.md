@@ -261,7 +261,7 @@ We formalize graph theory from the ground up in Lean 4: vertices, edges, paths, 
 To accelerate proof development we built an **autoresearch loop** that closes on itself in two stages:
 
 1. Instrument compilation so we can measure build time as a primary signal ([`scripts/measure-build.sh`](scripts/measure-build.sh)).
-2. Drive an autoresearch pipeline that rewrites proofs and optimizes compile time end-to-end ([`scripts/autoresearch.py`](scripts/autoresearch.py)).
+2. Drive an autoresearch pipeline that rewrites proofs and optimizes compile time end-to-end ([`scripts/autoresearch.py`](scripts/autoresearch.py) or [`scripts/autoresearch_with_forcegraph.py`](scripts/autoresearch_with_forcegraph.py) for version with decision force graph generation).
 
 ## Remaining Open Goals (deep graph theorems)
 
