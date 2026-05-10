@@ -321,9 +321,7 @@ Every run writes `proof-search.html` — an interactive force-directed graph
 showing exactly which candidates were tried, why each failed or passed, and
 why the chosen proof was selected over the alternatives.
 
-> **Replace the placeholder below with a screen-recording gif of the graph.**
-
-![Proof search decision trace](docs/proof-search-demo.gif)
+[![Proof search decision trace](docs/proof-search-screenshot.png)](https://oe-parks.github.io/UW-Lean-Hackathon/proof-search.html)
 
 Each node is a colour-coded card:
 
