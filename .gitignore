@@ -1,3 +1,9 @@
 /.lake
 /build-report.json
 physlib-master/
+
+# API keys — must never be committed.
+/api
+*.api
+api.key
+*.api.key
