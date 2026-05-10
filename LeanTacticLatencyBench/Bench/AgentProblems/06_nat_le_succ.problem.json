@@ -1,0 +1,7 @@
+{
+  "name": "nat_le_succ_all",
+  "difficulty": "easy",
+  "imports": [],
+  "statement": "theorem nat_le_succ_all : ∀ n : Nat, n ≤ n + 1",
+  "tags": ["easy", "arithmetic", "order"]
+}

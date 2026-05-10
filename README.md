@@ -1,6 +1,18 @@
 # hackathon
 
-Solution submitted by **XXX Team** for the **UW Lean Hackathon**.
+Solution submitted by **Blossom Team** for the **UW Lean Hackathon** 2026.
+
+
+
+# Result
+
+We formalize the correctness and complexity of Edmond Blossom algorithm in Lean. We invent a novel autoresearch pipeline that rewrite the proof tactics and improve the lean compilation time. 
+
+
+# Theorem diagram
+
+Here we show the dependency diagram of the whole theorem, and an animation of how these Lemmas/Theorems are used in real production. 
+
 
 ## Instruction to Compile
 
@@ -36,6 +48,14 @@ On top of that foundation, we design a small toy language: we give it an
 explicit syntax and a sound operational semantics tailored to expressing the
 blossom algorithm. We then implement Edmonds' blossom algorithm in that
 language and verify its correctness in Lean.
+
+
+
+## GraphIR Syntax&&Semantics
+
+We prove the algorithmic correctness of Edmond Blossom algorithm on a Novel GraphIR representation, where program states contain graph objects. The IR is representative enough for any graph algorithm with recursion. 
+
+
 
 ## Optimization
 

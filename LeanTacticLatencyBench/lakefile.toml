@@ -1,0 +1,8 @@
+name = "LeanTacticLatencyBench"
+version = "0.1.0"
+
+# This project is a benchmark harness, not a library.
+# The Lean files under `Bench/` are run individually by the Python
+# scripts via `lake env lean <file>`; they are intentionally not
+# included in any `lean_lib` target so that compilation failures (the
+# whole point of `Bench/FailedProofs/`) don't propagate to `lake build`.

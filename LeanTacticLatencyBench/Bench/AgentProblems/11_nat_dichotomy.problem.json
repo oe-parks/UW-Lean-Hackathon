@@ -1,0 +1,7 @@
+{
+  "name": "nat_dichotomy",
+  "difficulty": "hard",
+  "imports": [],
+  "statement": "theorem nat_dichotomy : ∀ a b : Nat, a ≤ b ∨ b ≤ a",
+  "tags": ["hard", "arithmetic", "case-analysis"]
+}

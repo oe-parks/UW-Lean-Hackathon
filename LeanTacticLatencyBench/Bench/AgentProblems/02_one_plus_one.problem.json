@@ -1,0 +1,7 @@
+{
+  "name": "one_plus_one",
+  "difficulty": "trivial",
+  "imports": [],
+  "statement": "theorem one_plus_one : (1 : Nat) + 1 = 2",
+  "tags": ["trivial", "arithmetic"]
+}

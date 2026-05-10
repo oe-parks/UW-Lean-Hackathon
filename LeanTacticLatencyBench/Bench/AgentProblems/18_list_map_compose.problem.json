@@ -1,0 +1,8 @@
+{
+  "name": "list_map_compose",
+  "difficulty": "very_hard",
+  "imports": [],
+  "statement": "theorem list_map_compose : ∀ (l : List Nat), ((l.map (· + 1)).map (· + 2)) = l.map (· + 3)",
+  "tags": ["very_hard", "list", "higher-order", "induction", "lambda"],
+  "description": "Higher-order: requires the agent to either fuse maps via `simp [List.map_map]` and a function-equality observation, or do induction and prove the per-element equation. Easy for an LLM that knows the lemma; hard for a tactic-pool agent."
+}

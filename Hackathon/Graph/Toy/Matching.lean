@@ -29,6 +29,7 @@ structure Matching (G : Graph V) where
   /-- Pairs in the matching. `edge u v` means "matched as a pair". -/
   edge : V → V → Prop
   /-- Matching edges are undirected. -/
+
   edge_symm : ∀ {u v : V}, edge u v → edge v u
   /-- No self-pairing. -/
   edge_irrefl : ∀ v : V, ¬ edge v v

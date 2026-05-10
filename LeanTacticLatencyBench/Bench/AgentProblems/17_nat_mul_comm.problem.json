@@ -1,0 +1,8 @@
+{
+  "name": "nat_mul_comm",
+  "difficulty": "very_hard",
+  "imports": [],
+  "statement": "theorem nat_mul_comm : ∀ a b : Nat, a * b = b * a",
+  "tags": ["very_hard", "arithmetic", "induction-twice"],
+  "description": "Notably harder than `nat_add_comm`: the standard proof uses two nested inductions or proves auxiliary `Nat.zero_mul`/`Nat.succ_mul` lemmas first. omega does NOT handle multiplication on Nat."
+}

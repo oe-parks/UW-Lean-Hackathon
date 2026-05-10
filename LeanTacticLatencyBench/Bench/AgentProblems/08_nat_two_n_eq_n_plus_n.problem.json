@@ -1,0 +1,7 @@
+{
+  "name": "two_n_eq_n_plus_n",
+  "difficulty": "medium",
+  "imports": [],
+  "statement": "theorem two_n_eq_n_plus_n : ∀ n : Nat, 2 * n = n + n",
+  "tags": ["medium", "arithmetic"]
+}

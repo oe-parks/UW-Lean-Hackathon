@@ -1,0 +1,8 @@
+{
+  "name": "list_length_append",
+  "difficulty": "hard",
+  "imports": [],
+  "statement": "theorem list_length_append : ∀ (l₁ l₂ : List Nat), (l₁ ++ l₂).length = l₁.length + l₂.length",
+  "tags": ["hard", "list", "induction", "mixed"],
+  "description": "Mixes list induction with Nat arithmetic. Induction on l₁ + simp + omega is the canonical proof."
+}

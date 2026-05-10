@@ -1,0 +1,7 @@
+{
+  "name": "nat_succ_ne_zero_all",
+  "difficulty": "medium",
+  "imports": [],
+  "statement": "theorem nat_succ_ne_zero_all : ∀ n : Nat, n.succ ≠ 0",
+  "tags": ["medium", "arithmetic", "induction-flavour"]
+}

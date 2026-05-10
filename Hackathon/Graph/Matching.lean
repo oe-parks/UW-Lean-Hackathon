@@ -84,29 +84,89 @@ structure IsAugmenting (M : G.Subgraph) {u v : V} (w : G.Walk u v) : Prop where
 
 /-- ★  The empty subgraph is a matching. -/
 example : (⊥ : G.Subgraph).IsMatching := by
-  -- HINT: unfold `IsMatching`. The hypothesis `M.Adj u v` is impossible.
-  sorry
+  intro v hv
+  simp at hv
 
 /-- ★★  In a matching, adjacency is a *partial function*: each vertex has at
 most one match. -/
 example {M : G.Subgraph} (hM : M.IsMatching) {u v w : V}
     (huv : M.Adj u v) (huw : M.Adj u w) : v = w := by
-  -- HINT: unfold `IsMatching`. Apply `hM` at `u`, get unique-existence.
-  sorry
+  obtain ⟨x, _, hux⟩ := hM (M.edge_vert huv)
+  exact (hux v huv).trans (hux w huw).symm
 
 /-- ★★  The empty walk is alternating in any matching `M` (vacuously). -/
 example (M : G.Subgraph) (v : V) :
     IsAlternating M (Walk.nil : G.Walk v v) := by
-  -- HINT: unfold `IsAlternating`. The walk has no edges, so the
-  --       hypothesis `i + 1 < 0` is impossible.
-  sorry
+  intro i hi
+  simp [Walk.edges] at hi
 
-/-- ★★★  In a *bipartite* graph, every augmenting path has odd length.
-(Sketch only — finish in Phase 2.) -/
-example {M : G.Subgraph} {u v : V} (w : G.Walk u v) (h : IsAugmenting M w) :
+/-- ★★★  Every non-empty `M`-augmenting path has odd length.
+The empty case (`u = v`, `w = .nil`) is excluded by `1 ≤ w.length`. -/
+example {M : G.Subgraph} {u v : V} (w : G.Walk u v) (h : IsAugmenting M w)
+    (hlen : 1 ≤ w.length) :
     Odd w.length := by
-  -- HINT: a path that starts and ends with non-`M` edges and alternates
-  --       has an even number of `M` edges and odd total length.
-  sorry
+  classical
+  obtain ⟨_, hAlt, hu, hv⟩ := h
+  have hLE : w.edges.length = w.length := w.length_edges
+  have hpos : 0 < w.edges.length := by rw [hLE]; exact hlen
+  have hEdgesNonempty : w.edges ≠ [] := List.length_pos_iff.mp hpos
+  -- Step 1: First edge of `w` is not in `M.edgeSet`. Cases on `w`.
+  have h_first : (w.edges[0]'hpos) ∉ M.edgeSet := by
+    revert hpos
+    cases w with
+    | nil => intro hpos; simp at hpos
+    | @cons a b c hadj p =>
+      intro _
+      simp only [Walk.edges_cons, List.getElem_cons_zero]
+      intro hMem
+      exact hu (M.edge_vert (Subgraph.mem_edgeSet.mp hMem))
+  -- Step 2: Last edge of `w` contains `v`, so isn't in `M.edgeSet`.
+  have hLastEdge : w.edges.getLast hEdgesNonempty = s(w.penultimate, v) :=
+    Walk.getLast_edges_eq_mk_penultimate_end _
+  have h_last : (w.edges[w.edges.length - 1]'(by omega)) ∉ M.edgeSet := by
+    have hEq : w.edges[w.edges.length - 1]'(by omega) = w.edges.getLast hEdgesNonempty := by
+      rw [List.getLast_eq_getElem]
+    rw [hEq, hLastEdge]
+    intro hMem
+    apply hv
+    exact M.mem_verts_of_mem_edge hMem (by simp [Sym2.mem_iff])
+  -- Step 3: Prove by induction on `i` that `(w.edges[i] ∈ M.edgeSet) ↔ Odd i`.
+  have hKey : ∀ i (hi : i < w.edges.length),
+      (w.edges[i] ∈ M.edgeSet ↔ Odd i) := by
+    intro i hi
+    induction i with
+    | zero =>
+      refine ⟨fun hMem => absurd hMem h_first, fun hOdd => ?_⟩
+      exact absurd hOdd (by decide)
+    | succ k ih =>
+      have hk : k < w.edges.length := Nat.lt_of_succ_lt hi
+      have ihk := ih hk
+      have hAltLocal : (w.edges[k]'hk ∈ M.edgeSet) ≠ (w.edges[k+1]'hi ∈ M.edgeSet) :=
+        hAlt hi
+      constructor
+      · intro hSucc
+        have h_k_notIn : w.edges[k]'hk ∉ M.edgeSet := fun hKin =>
+          hAltLocal (propext (Iff.intro (fun _ => hSucc) (fun _ => hKin)))
+        have hNotOddK : ¬ Odd k := fun hOdd => h_k_notIn (ihk.mpr hOdd)
+        rcases Nat.even_or_odd k with hEvenK | hOddK
+        · exact hEvenK.add_one
+        · exact absurd hOddK hNotOddK
+      · intro hOddSucc
+        rcases hOddSucc with ⟨j, hj⟩
+        have hEvenK : Even k := ⟨j, by omega⟩
+        have hNotOddK : ¬ Odd k := fun hOdd => (Nat.not_odd_iff_even.mpr hEvenK) hOdd
+        have h_k_notIn : w.edges[k]'hk ∉ M.edgeSet := fun hMem => hNotOddK (ihk.mp hMem)
+        by_contra hSuccNotIn
+        apply hAltLocal
+        exact propext (Iff.intro (fun hKin => absurd hKin h_k_notIn)
+                                  (fun hSuccIn => absurd hSuccIn hSuccNotIn))
+  -- Step 4: At index `length - 1`, edge is not in M, so `length - 1` is even, so `length` is odd.
+  have hLastIff := hKey (w.edges.length - 1) (by omega)
+  have hNotOddLast : ¬ Odd (w.edges.length - 1) := fun hO => h_last (hLastIff.mpr hO)
+  rcases Nat.even_or_odd (w.edges.length - 1) with hE | hO
+  · rw [← hLE]
+    rcases hE with ⟨k, hk⟩
+    exact ⟨k, by omega⟩
+  · exact absurd hO hNotOddLast
 
 end Hackathon

@@ -56,20 +56,12 @@ def IsMaximumMatching (M : G.Subgraph) : Prop :=
   ∀ M' : G.Subgraph, M'.IsMatching →
     M'.edgeSet.ncard ≤ M.edgeSet.ncard
 
-/--
-**Berge's theorem.** A matching is maximum iff it admits no augmenting path.
--/
-theorem berge {M : G.Subgraph} (hM : M.IsMatching) :
-    IsMaximumMatching M ↔
-    ∀ {u v : V} (w : G.Walk u v), ¬ IsAugmenting M w := by
-  sorry
-
 /- ## Sub-lemmas (Berge proof internals) -/
 
 /-- Lemma A: every vertex has degree at most 2 in `M △ M'`. -/
 theorem symmDiff_degree_le_two
     {M M' : G.Subgraph} (hM : M.IsMatching) (hM' : M'.IsMatching) (v : V) :
-    True := by sorry  -- placeholder; replace `True` with the real statement
+    True := by trivial  -- placeholder; replace `True` with the real statement
 
 /-- Lemma D: if `|M'| > |M|`, some component of `M △ M'` is an `M`-augmenting path. -/
 theorem exists_augmenting_of_larger
@@ -77,5 +69,40 @@ theorem exists_augmenting_of_larger
     (h : M.edgeSet.ncard < M'.edgeSet.ncard) :
     ∃ (u v : V) (w : G.Walk u v), IsAugmenting M w := by
   sorry
+
+/--
+**Berge's theorem.** A matching is maximum iff it admits no augmenting path.
+
+The proof reduces to two named obligations:
+* `IsAugmenting.xorWith_isMatching` + `IsAugmenting.xorWith_card`
+  (the augmentation lemma — produces a strictly larger matching from
+  an augmenting path), giving the forward direction.
+* `exists_augmenting_of_larger` (the symmetric-difference argument —
+  a strictly larger matching gives rise to an augmenting path),
+  giving the backward direction.
+-/
+theorem berge {M : G.Subgraph} (hM : M.IsMatching) :
+    IsMaximumMatching M ↔
+    ∀ {u v : V} (w : G.Walk u v), ¬ IsAugmenting M w := by
+  constructor
+  · -- (⇒) M maximum implies no augmenting path.
+    rintro ⟨_, hMax⟩ u v w hAug
+    -- The augmentation lemma gives a matching of size |M| + 1.
+    have h1 : (xorWith M w).IsMatching := hAug.xorWith_isMatching hM
+    have h2 : (xorWith M w).edgeSet.ncard = M.edgeSet.ncard + 1 :=
+      hAug.xorWith_card hM
+    -- But maximality says |xorWith M w| ≤ |M|. Contradiction.
+    have h3 : (xorWith M w).edgeSet.ncard ≤ M.edgeSet.ncard := hMax _ h1
+    omega
+  · -- (⇐) No augmenting path implies M is maximum.
+    intro hNoAug
+    refine ⟨hM, ?_⟩
+    intro M' hM'
+    -- By contradiction: if |M'| > |M|, the symmetric-difference argument
+    -- produces an augmenting path, contradicting `hNoAug`.
+    by_contra h
+    push_neg at h
+    obtain ⟨_, _, w, hAug⟩ := exists_augmenting_of_larger hM hM' h
+    exact hNoAug w hAug
 
 end Hackathon

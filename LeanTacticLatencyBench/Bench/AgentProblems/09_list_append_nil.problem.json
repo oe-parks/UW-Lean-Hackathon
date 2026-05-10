@@ -1,0 +1,7 @@
+{
+  "name": "list_append_nil_nat",
+  "difficulty": "medium",
+  "imports": [],
+  "statement": "theorem list_append_nil_nat : ∀ (l : List Nat), l ++ [] = l",
+  "tags": ["medium", "list", "induction"]
+}

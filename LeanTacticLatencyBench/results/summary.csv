@@ -1,0 +1,30 @@
+kind,label,file_or_goal,repeat,elapsed_s,exit_code,timed_out,max_rss_kb,user_s,system_s,kill_latency_s,time_to_first_success_s,total_cpu_time_s
+failed_proof,failed_proofs_e2e,Bench/FailedProofs/HeavySimpFails.lean,0,0.22955918600200675,1,False,444332,0.17,0.05,,,
+failed_proof,failed_proofs_e2e,Bench/FailedProofs/HeavySimpFails.lean,1,0.21714972099289298,1,False,444264,0.15,0.05,,,
+failed_proof,failed_proofs_e2e,Bench/FailedProofs/SlowDecideFails.lean,0,0.1883924329886213,1,False,442164,0.13,0.05,,,
+failed_proof,failed_proofs_e2e,Bench/FailedProofs/SlowDecideFails.lean,1,0.18697766499826685,1,False,442224,0.13,0.04,,,
+failed_proof,failed_proofs_e2e,Bench/FailedProofs/SlowRflFails.lean,0,0.18688077000842895,1,False,441764,0.1,0.08,,,
+failed_proof,failed_proofs_e2e,Bench/FailedProofs/SlowRflFails.lean,1,0.18637120199855417,1,False,441612,0.12,0.05,,,
+failed_proof,failed_proofs_e2e,Bench/FailedProofs/SlowSimpFails.lean,0,0.23590841199620627,1,False,444400,0.16,0.07,,,
+failed_proof,failed_proofs_e2e,Bench/FailedProofs/SlowSimpFails.lean,1,0.2329139779903926,1,False,444504,0.18,0.04,,,
+lsp_stale_cancel,lsp_stale_e2e,/home/ec2-user/UW-Lean-Hackathon-1/LeanTacticLatencyBench/Bench/LspStale/SlowVersion.lean,,0.20177269699343015,,False,,,,,,
+portfolio_winner,portfolio_e2e,linear_arith_comm :: intro a b; exact Nat.add_comm a b,,0.20183812799223233,0,,,,,,0.20111472699500155,0.77
+portfolio_loser,portfolio_e2e,linear_arith_comm :: intro a b; omega,,0.20332880200294312,0,,435696,0.13,0.07,,,
+portfolio_loser,portfolio_e2e,linear_arith_comm :: intros; rfl,,0.20237405601073988,1,,435004,0.14,0.05,,,
+portfolio_loser,portfolio_e2e,linear_arith_comm :: intro a b; simp [Nat.add_comm],,0.20119230900309049,0,,435928,0.13,0.06,,,
+portfolio_winner,portfolio_e2e,trivial_truth :: trivial,,0.20303213699662592,0,,,,,,0.2010337259998778,0.75
+portfolio_loser,portfolio_e2e,trivial_truth :: exact True.intro,,0.20251818699762225,0,,432952,0.13,0.06,,,
+portfolio_loser,portfolio_e2e,trivial_truth :: rfl,,0.2019067399960477,1,,434648,0.11,0.08,,,
+portfolio_loser,portfolio_e2e,trivial_truth :: constructor,,0.20125539400032721,0,,433136,0.13,0.05,,,
+portfolio_winner,portfolio_e2e,concrete_le :: decide,,0.20303253999736626,0,,,,,,0.20116333199257497,0.76
+portfolio_loser,portfolio_e2e,concrete_le :: omega,,0.20252478600014,0,,435676,0.15,0.04,,,
+portfolio_loser,portfolio_e2e,concrete_le :: exact (by simp : 100 ≤ 200),,0.20194710900250357,0,,435216,0.13,0.06,,,
+portfolio_loser,portfolio_e2e,concrete_le :: norm_num,,0.2013689889863599,1,,433236,0.14,0.05,,,
+portfolio_winner,portfolio_e2e,with_hypothesis :: intro n; simp,,0.2232003539975267,0,,,,,,0.22122682399640325,0.79
+portfolio_loser,portfolio_e2e,with_hypothesis :: intro n; rfl,,0.22267739499511663,0,,433460,0.13,0.07,,,
+portfolio_loser,portfolio_e2e,with_hypothesis :: intro n; exact Nat.add_zero n,,0.22207246400648728,0,,433504,0.11,0.08,,,
+portfolio_loser,portfolio_e2e,with_hypothesis :: intro n; omega,,0.22143075200438034,0,,435456,0.13,0.07,,,
+portfolio_winner,portfolio_e2e,fast_vs_slow :: trivial,,0.20282342100108508,0,,,,,,0.20095172899891622,0.2
+portfolio_loser,portfolio_e2e,fast_vs_slow :: (have : (List.replicate 200 (0:Nat)).foldr (· + ·) 0 = 0 := by rfl); trivial,,0.25232758099446073,-15,,,,,0.050125205001677386,,
+portfolio_loser,portfolio_e2e,fast_vs_slow :: (have : (List.replicate 800 (0:Nat)).foldr (· + ·) 0 = 0 := by rfl); trivial,,0.25180219499452505,-15,,,,,0.05015821399865672,,
+portfolio_loser,portfolio_e2e,fast_vs_slow :: (have : (List.replicate 3000 (0:Nat)).foldr (· + ·) 0 = 0 := by rfl); trivial,,0.25123319900012575,-15,,,,,0.05019860800530296,,

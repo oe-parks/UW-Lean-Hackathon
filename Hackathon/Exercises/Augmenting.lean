@@ -57,26 +57,31 @@ abbrev c4_loop : Walk C4 (0 : Fin 4) 0 :=
 /-! ## Length and support -/
 
 /-- ★  `p4_walk` has length 3. -/
-example : p4_walk.length = 3 := by sorry
+example : p4_walk.length = 3 := rfl
 
 /-- ★  `p5_walk` has length 4. -/
-example : p5_walk.length = 4 := by sorry
+example : p5_walk.length = 4 := rfl
 
 /-- ★★  `c4_loop` has length 4. -/
-example : c4_loop.length = 4 := by sorry
+example : c4_loop.length = 4 := rfl
 
 /-! ## Path-ness -/
 
-/-- ★★  `p4_walk` is a path.
-    HINT: pattern from `Worked.lean §5`. -/
-example : p4_walk.IsPath := by sorry
+/-- ★★  `p4_walk` is a path. -/
+example : p4_walk.IsPath := by
+  change p4_walk.support.Nodup
+  decide
 
 /-- ★★  `p5_walk` is a path. -/
-example : p5_walk.IsPath := by sorry
+example : p5_walk.IsPath := by
+  change p5_walk.support.Nodup
+  decide
 
-/-- ★★  `c4_loop` is *not* a path: it revisits vertex `0`.
-    HINT: prove that `[0, 1, 2, 3, 0].Nodup` is false. -/
-example : ¬ c4_loop.IsPath := by sorry
+/-- ★★  `c4_loop` is *not* a path: it revisits vertex `0`. -/
+example : ¬ c4_loop.IsPath := by
+  intro h
+  change c4_loop.support.Nodup at h
+  exact absurd h (by decide)
 
 /-! ## Matchings used by the augmenting-path exercises -/
 
@@ -127,16 +132,33 @@ def M_P5_12_34 : Matching P5 where
 
 /-! ## Alternating proofs -/
 
-/-- ★★  `p4_walk` is `M_P4_12`-alternating.
-    HINT: pattern from `Worked.lean §6`. Use `step` once, then `step`
-    again, then `single`. -/
-example : M_P4_12.IsAlternating p4_walk := by sorry
+/-- ★★  `p4_walk` is `M_P4_12`-alternating. -/
+example : M_P4_12.IsAlternating p4_walk := by
+  apply Matching.IsAlternating.step
+  · constructor
+    · intro h; rcases h with ⟨h, _⟩ | ⟨h, _⟩ <;> omega
+    · intro h; exact absurd (Or.inl ⟨rfl, rfl⟩) h
+  · apply Matching.IsAlternating.step
+    · constructor
+      · intro _ h₂; rcases h₂ with ⟨h, _⟩ | ⟨h, _⟩ <;> omega
+      · intro _; exact Or.inl ⟨rfl, rfl⟩
+    · apply Matching.IsAlternating.single
 
-/-- ★★★  `p5_walk` is `M_P5_12_34`-alternating.
-    HINT: three applications of `step`, then `single`. The four
-    consecutive edge-pairs all flip M-membership:
-    `(0,1) ∉ M`, `(1,2) ∈ M`, `(2,3) ∉ M`, `(3,4) ∈ M`. -/
-example : M_P5_12_34.IsAlternating p5_walk := by sorry
+/-- ★★★  `p5_walk` is `M_P5_12_34`-alternating. -/
+example : M_P5_12_34.IsAlternating p5_walk := by
+  apply Matching.IsAlternating.step
+  · constructor
+    · intro h; rcases h with ⟨h, _⟩ | ⟨h, _⟩ | ⟨h, _⟩ | ⟨h, _⟩ <;> omega
+    · intro h; exact absurd (Or.inl ⟨rfl, rfl⟩) h
+  · apply Matching.IsAlternating.step
+    · constructor
+      · intro _ h₂; rcases h₂ with ⟨h, _⟩ | ⟨h, _⟩ | ⟨h, _⟩ | ⟨h, _⟩ <;> omega
+      · intro _; exact Or.inl ⟨rfl, rfl⟩
+    · apply Matching.IsAlternating.step
+      · constructor
+        · intro h; rcases h with ⟨h, _⟩ | ⟨h, _⟩ | ⟨h, _⟩ | ⟨h, _⟩ <;> omega
+        · intro h; exact absurd (Or.inr (Or.inr (Or.inl ⟨rfl, rfl⟩))) h
+      · apply Matching.IsAlternating.single
 
 /-! ## Augmenting paths
 
@@ -144,22 +166,32 @@ These are the showcase exercises — pattern from `Worked.lean §7`.
 -/
 
 /-- ★★★  `p4_walk` is an `M_P4_12`-augmenting path. -/
-example : Walk.IsAugmenting M_P4_12 p4_walk := by sorry
+example : Walk.IsAugmenting M_P4_12 p4_walk where
+  nonEmpty := by decide
+  isPath := by change p4_walk.support.Nodup; decide
+  alternating := by
+    apply Matching.IsAlternating.step
+    · constructor
+      · intro h; rcases h with ⟨h, _⟩ | ⟨h, _⟩ <;> omega
+      · intro h; exact absurd (Or.inl ⟨rfl, rfl⟩) h
+    · apply Matching.IsAlternating.step
+      · constructor
+        · intro _ h₂; rcases h₂ with ⟨h, _⟩ | ⟨h, _⟩ <;> omega
+        · intro _; exact Or.inl ⟨rfl, rfl⟩
+      · apply Matching.IsAlternating.single
+  firstNotInM := by
+    apply Matching.firstEdgeNotInM.here
+    intro h; rcases h with ⟨h, _⟩ | ⟨h, _⟩ <;> omega
+  startUnmatched := by
+    intro u h; rcases h with ⟨_, h⟩ | ⟨_, h⟩ <;> omega
+  endUnmatched := by
+    intro u h; rcases h with ⟨_, h⟩ | ⟨_, h⟩ <;> omega
 
-/-- ★★★  `p5_walk` is an `M_P5_12_34`-augmenting path.
-
-Note: this matching covers `{1,2,3,4}`; only vertex `0` is exposed. So
-both endpoints of `p5_walk` (vertices `0` and `4`) are unmatched —
-wait, vertex `4` *is* matched (to `3`)! Re-check: the walk `0→1→2→3→4`
-ends at `4`, which is matched. So this walk is **not** augmenting.
-
-Replace this exercise with a refutation: prove that the walk is
-*not* augmenting. -/
+/-- ★★★  `p5_walk` is *not* `M_P5_12_34`-augmenting (vertex 4 is matched). -/
 example : ¬ Walk.IsAugmenting M_P5_12_34 p5_walk := by
-  -- HINT: the proof is by contradiction. Extract `endUnmatched` from
-  -- the augmenting structure and derive `M_P5_12_34.IsUnmatched 4`,
-  -- which is false because `M_P5_12_34.edge 3 4` holds.
-  sorry
+  intro h
+  -- endUnmatched would say 4 has no partner, but (3, 4) is in M.
+  exact h.endUnmatched 3 (Or.inr (Or.inr (Or.inl ⟨rfl, rfl⟩)))
 
 /-! ## Refuting augmenting paths -/
 
@@ -168,34 +200,37 @@ example : ¬ Walk.IsAugmenting M_P5_12_34 p5_walk := by
 example :
     let w : Walk C5 (0 : Fin 5) 0 :=
       Walk.cons c5_h01 (Walk.cons c5_h12 (Walk.cons c5_h23 (Walk.cons c5_h34
-        (Walk.cons (by
-          -- HINT: `(4, 0)` is the wrap-around edge of `C5`. Build the proof.
-          sorry) Walk.nil))))
+        (Walk.cons (⟨by decide, Or.inr (Or.inr (Or.inr ⟨rfl, rfl⟩))⟩) Walk.nil))))
     ¬ Walk.IsAugmenting (Matching.empty C5) w := by
-  sorry
+  intro w h
+  -- The walk's support is [0, 1, 2, 3, 4, 0] which has duplicates.
+  have hpath : w.support.Nodup := h.isPath
+  exact absurd hpath (by decide)
 
 /-- ★★  The walk `0 → 1` in `P4`, against the **empty** matching, *is*
-    augmenting (length 1, both endpoints unmatched, first edge not in
-    M).
-    HINT: an augmenting walk doesn't have to be long. Length-1 walks
-    are augmenting iff both endpoints are unmatched. Use
-    `IsAlternating.single` for the alternating part. -/
+    augmenting (length 1, both endpoints unmatched, first edge not in M). -/
 example :
-    Walk.IsAugmenting (Matching.empty P4) (Walk.cons p4_h01 Walk.nil) := by
-  sorry
+    Walk.IsAugmenting (Matching.empty P4) (Walk.cons p4_h01 Walk.nil) where
+  nonEmpty := by decide
+  isPath := by
+    change (Walk.cons p4_h01 Walk.nil).support.Nodup
+    decide
+  alternating := Matching.IsAlternating.single _
+  firstNotInM := Matching.firstEdgeNotInM.here _ _ (fun h => h.elim)
+  startUnmatched := fun u h => h.elim
+  endUnmatched := fun u h => h.elim
 
 /-! ## Conceptual lemmas -/
 
-/-- ★★★  An augmenting walk has length ≥ 1.
-    HINT: it's literally the `nonEmpty` field. -/
+/-- ★★★  An augmenting walk has length ≥ 1. -/
 example {V : Type*} {G : Graph V} {M : Matching G} {u v : V}
     {w : Walk G u v} (h : Walk.IsAugmenting M w) :
-    1 ≤ w.length := by sorry
+    1 ≤ w.length := h.nonEmpty
 
-/-- ★★★  If a walk is augmenting, both its endpoints are unmatched.
-    HINT: `startUnmatched` and `endUnmatched`. -/
+/-- ★★★  If a walk is augmenting, both its endpoints are unmatched. -/
 example {V : Type*} {G : Graph V} {M : Matching G} {u v : V}
     {w : Walk G u v} (h : Walk.IsAugmenting M w) :
-    M.IsUnmatched u ∧ M.IsUnmatched v := by sorry
+    M.IsUnmatched u ∧ M.IsUnmatched v :=
+  ⟨h.startUnmatched, h.endUnmatched⟩
 
 end Hackathon.Toy.Exercises.Augmenting
