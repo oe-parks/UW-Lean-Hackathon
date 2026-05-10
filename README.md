@@ -47,6 +47,8 @@ FindAugmentingPath(G, M):
 
 ![Augmenting Path Discovery](visuals/augmenting_path_manim.gif)
 
+[![Proof search decision trace](docs/proof-search-screenshot.png)](http://owenparks.com/autoresearch-trace/blossom/)
+
 ## Why this matters
 
 - **First Lean formalization of Edmonds' blossom algorithm.** To our knowledge, no prior work in Lean 4 (or Lean 3) has formalized the *correctness* of Edmonds' algorithm end-to-end; only fragments of underlying matching theory exist in Mathlib.
