@@ -113,13 +113,14 @@ example {M : G.Subgraph} {u v : V} (w : G.Walk u v) (h : IsAugmenting M w)
   have hEdgesNonempty : w.edges ≠ [] := List.length_pos_iff.mp hpos
   -- Step 1: First edge of `w` is not in `M.edgeSet`. Cases on `w`.
   have h_first : (w.edges[0]'hpos) ∉ M.edgeSet := by
+    revert hpos
     cases w with
-    | nil => exact absurd hpos (by simp [Walk.edges])
+    | nil => intro hpos; simp at hpos
     | @cons a b c hadj p =>
-    simp only [Walk.edges_cons, List.getElem_cons_zero]
-    intro hMem
-    have hVert : a ∈ M.verts := M.edge_vert (Subgraph.mem_edgeSet.mp hMem)
-    exact hu hVert
+      intro _
+      simp only [Walk.edges_cons, List.getElem_cons_zero]
+      intro hMem
+      exact hu (M.edge_vert (Subgraph.mem_edgeSet.mp hMem))
   -- Step 2: Last edge of `w` contains `v`, so isn't in `M.edgeSet`.
   have hLastEdge : w.edges.getLast hEdgesNonempty = s(w.penultimate, v) :=
     Walk.getLast_edges_eq_mk_penultimate_end _
