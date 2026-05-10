@@ -124,7 +124,7 @@ score = 0.1 × compile_time
 
 Every run writes `proof-search.html` — an interactive force-directed graph showing exactly which candidates were tried, why each failed or passed, and why the chosen proof was selected.
 
-[![Proof search decision trace](docs/proof-search-screenshot.png)](http://owenparks.com/autoresearch-trace/)
+[![Proof search decision trace](docs/proof-search-screenshot.png)](http://owenparks.com/autoresearch-trace/blossom/)
 
 | Colour | Meaning |
 |---|---|
