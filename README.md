@@ -1,4 +1,4 @@
-# Hackathon — Formalizing Edmonds' Blossom in Lean 4
+Formalizing Edmonds' Blossom in Lean 4
 
 Solution submitted by **Team Blossom** for the **UW Lean Hackathon 2026**.
 
@@ -47,6 +47,8 @@ FindAugmentingPath(G, M):
   *The algorithm returns a matching no other matching can beat.* The actual IR encoding lives in `blossomFuns` in [`Hackathon/GraphIR/Blossom.lean`](Hackathon/GraphIR/Blossom.lean).
 
 ![Augmenting Path Discovery](visuals/augmenting_path_manim.gif)
+
+[![Proof search decision trace](docs/proof-search-screenshot.png)](http://owenparks.com/autoresearch-trace/blossom/)
 
 ## Why this matters
 
@@ -125,7 +127,7 @@ score = 0.1 × compile_time
 
 Every run writes `proof-search.html` — an interactive force-directed graph showing exactly which candidates were tried, why each failed or passed, and why the chosen proof was selected.
 
-[![Proof search decision trace](docs/proof-search-screenshot.png)](https://oe-parks.github.io/UW-Lean-Hackathon/proof-search.html)
+[![Proof search decision trace](docs/proof-search-screenshot.png)](http://owenparks.com/autoresearch-trace/blossom/)
 
 | Colour | Meaning |
 |---|---|
