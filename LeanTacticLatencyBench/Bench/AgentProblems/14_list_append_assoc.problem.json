@@ -1,0 +1,8 @@
+{
+  "name": "list_append_assoc",
+  "difficulty": "hard",
+  "imports": [],
+  "statement": "theorem list_append_assoc : ∀ (l₁ l₂ l₃ : List Nat), (l₁ ++ l₂) ++ l₃ = l₁ ++ (l₂ ++ l₃)",
+  "tags": ["hard", "list", "induction"],
+  "description": "Standard induction-on-l₁. omega does NOT help here."
+}

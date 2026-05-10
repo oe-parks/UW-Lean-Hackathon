@@ -25,3 +25,15 @@ import Hackathon.Exercises.Graphs
 import Hackathon.Exercises.Worked
 import Hackathon.Exercises.Matchings
 import Hackathon.Exercises.Augmenting
+
+-- GraphIR (Layer 2.5): functional/SSA-style IR for graph algorithms,
+-- with a runnable interpreter and a BFS correctness scaffold.
+import Hackathon.GraphIR.Types
+import Hackathon.GraphIR.Syntax
+import Hackathon.GraphIR.Builtins
+import Hackathon.GraphIR.Interpreter
+import Hackathon.GraphIR.Examples
+import Hackathon.GraphIR.BFS
+import Hackathon.GraphIR.Blossom
+import Hackathon.GraphIR.Verify
+import Hackathon.GraphIR.Primitives

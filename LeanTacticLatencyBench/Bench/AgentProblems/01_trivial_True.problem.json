@@ -1,0 +1,8 @@
+{
+  "name": "triv_True",
+  "difficulty": "trivial",
+  "imports": [],
+  "statement": "theorem triv_True : True",
+  "tags": ["trivial", "warm-up"],
+  "description": "Prove True. Any agent that fails this is broken."
+}

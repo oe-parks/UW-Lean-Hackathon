@@ -1,0 +1,28 @@
+# Local config (with API keys).
+config.env
+
+# Lake / Lean build artifacts.
+.lake/
+build/
+*.olean
+
+# Python.
+__pycache__/
+*.pyc
+.venv/
+
+# Editor.
+.vscode/
+.idea/
+
+# Bench output: keep raw/ and agents/ structure tracked but ignore
+# the per-run subdirectories, which are large and locally generated.
+results/raw/*
+results/agents/*
+!results/raw/.gitkeep
+!results/agents/.gitkeep
+!results/NOTES.md
+
+# Web UI artifacts.
+web/server.log
+web/server.pid

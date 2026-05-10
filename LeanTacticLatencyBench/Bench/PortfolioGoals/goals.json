@@ -1,0 +1,62 @@
+[
+  {
+    "name": "linear_arith_comm",
+    "preamble": "",
+    "goal": "∀ a b : Nat, a + b = b + a",
+    "candidates": [
+      "intro a b; omega",
+      "intros; rfl",
+      "intro a b; exact Nat.add_comm a b",
+      "intro a b; simp [Nat.add_comm]"
+    ],
+    "expected_winners": ["intro a b; omega", "intro a b; exact Nat.add_comm a b", "intro a b; simp [Nat.add_comm]"]
+  },
+  {
+    "name": "trivial_truth",
+    "preamble": "",
+    "goal": "True",
+    "candidates": [
+      "trivial",
+      "exact True.intro",
+      "rfl",
+      "constructor"
+    ],
+    "expected_winners": ["trivial", "exact True.intro", "constructor"]
+  },
+  {
+    "name": "concrete_le",
+    "preamble": "",
+    "goal": "100 ≤ 200",
+    "candidates": [
+      "decide",
+      "omega",
+      "exact (by simp : 100 ≤ 200)",
+      "norm_num"
+    ],
+    "expected_winners": ["decide", "omega"]
+  },
+  {
+    "name": "with_hypothesis",
+    "preamble": "",
+    "goal": "∀ n : Nat, n + 0 = n",
+    "candidates": [
+      "intro n; simp",
+      "intro n; rfl",
+      "intro n; exact Nat.add_zero n",
+      "intro n; omega"
+    ],
+    "expected_winners": ["intro n; simp", "intro n; rfl", "intro n; exact Nat.add_zero n", "intro n; omega"]
+  },
+  {
+    "name": "fast_vs_slow",
+    "preamble": "",
+    "goal": "True",
+    "candidates": [
+      "trivial",
+      "(have : (List.replicate 200 (0:Nat)).foldr (· + ·) 0 = 0 := by rfl); trivial",
+      "(have : (List.replicate 800 (0:Nat)).foldr (· + ·) 0 = 0 := by rfl); trivial",
+      "(have : (List.replicate 3000 (0:Nat)).foldr (· + ·) 0 = 0 := by rfl); trivial"
+    ],
+    "expected_winners": ["trivial"]
+  }
+]

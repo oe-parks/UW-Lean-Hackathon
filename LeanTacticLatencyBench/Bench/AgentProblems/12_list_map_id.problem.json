@@ -1,0 +1,7 @@
+{
+  "name": "list_map_id_nat",
+  "difficulty": "hard",
+  "imports": [],
+  "statement": "theorem list_map_id_nat : ∀ (l : List Nat), l.map id = l",
+  "tags": ["hard", "list", "higher-order"]
+}

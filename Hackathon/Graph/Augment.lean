@@ -33,12 +33,25 @@ variable {V : Type*} {G : SimpleGraph V}
 
 /--
 The symmetric difference of a matching `M` with the edges of a walk `w`,
-returned as a subgraph of `G`.
+returned as a subgraph of `G`. Adjacency:
 
-Construction sketch (one possible encoding):
-  Adj a b := (M.Adj a b) XOR (s(a,b) ∈ w.edges)
+  `Adj a b` iff exactly one of `M.Adj a b` and `s(a,b) ∈ w.edges` holds
+  (and `G.Adj a b`, to remain a subgraph of `G`).
 -/
-def xorWith (M : G.Subgraph) {u v : V} (w : G.Walk u v) : G.Subgraph := sorry
+def xorWith (M : G.Subgraph) {u v : V} (w : G.Walk u v) : G.Subgraph where
+  verts := Set.univ
+  Adj a b := G.Adj a b ∧ (M.Adj a b ↔ s(a, b) ∉ w.edges)
+  adj_sub h := h.1
+  edge_vert _ := Set.mem_univ _
+  symm := by
+    intro a b ⟨hab, hxor⟩
+    refine ⟨hab.symm, ?_⟩
+    rw [show s(b, a) = s(a, b) from Sym2.eq_swap]
+    constructor
+    · intro h
+      exact hxor.mp (M.symm h)
+    · intro h
+      exact M.symm (hxor.mpr h)
 
 /--
 **Augmentation lemma.** If `w` is `M`-augmenting, then `xorWith M w`

@@ -1,0 +1,7 @@
+{
+  "name": "nat_add_zero_all",
+  "difficulty": "easy",
+  "imports": [],
+  "statement": "theorem nat_add_zero_all : ∀ n : Nat, n + 0 = n",
+  "tags": ["easy", "arithmetic"]
+}

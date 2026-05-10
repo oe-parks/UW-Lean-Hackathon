@@ -1,0 +1,7 @@
+{
+  "name": "list_length_reverse",
+  "difficulty": "medium",
+  "imports": [],
+  "statement": "theorem list_length_reverse : ∀ (l : List Nat), l.reverse.length = l.length",
+  "tags": ["medium", "list", "induction"]
+}

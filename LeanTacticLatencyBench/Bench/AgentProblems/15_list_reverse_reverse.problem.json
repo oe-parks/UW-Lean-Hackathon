@@ -1,0 +1,8 @@
+{
+  "name": "list_reverse_reverse",
+  "difficulty": "very_hard",
+  "imports": [],
+  "statement": "theorem list_reverse_reverse : ∀ (l : List Nat), l.reverse.reverse = l",
+  "tags": ["very_hard", "list", "induction", "auxiliary-lemma"],
+  "description": "Classic. Direct induction stalls at `(t.reverse ++ [h]).reverse = h :: t`. Either `simp` knows `reverse_append` or the agent must prove an auxiliary lemma."
+}

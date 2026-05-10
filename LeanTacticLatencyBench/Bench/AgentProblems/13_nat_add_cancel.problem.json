@@ -1,0 +1,8 @@
+{
+  "name": "nat_add_cancel_left",
+  "difficulty": "hard",
+  "imports": [],
+  "statement": "theorem nat_add_cancel_left : ∀ a b c : Nat, a + b = a + c → b = c",
+  "tags": ["hard", "arithmetic", "induction", "implication"],
+  "description": "Cancellation. omega handles this; agents that try only `simp` / `rfl` will fail."
+}

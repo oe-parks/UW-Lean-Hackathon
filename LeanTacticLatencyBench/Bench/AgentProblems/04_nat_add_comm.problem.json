@@ -1,0 +1,7 @@
+{
+  "name": "nat_add_comm_all",
+  "difficulty": "easy",
+  "imports": [],
+  "statement": "theorem nat_add_comm_all : ∀ a b : Nat, a + b = b + a",
+  "tags": ["easy", "arithmetic", "commutativity"]
+}

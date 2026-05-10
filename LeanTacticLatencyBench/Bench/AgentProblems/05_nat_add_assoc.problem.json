@@ -1,0 +1,7 @@
+{
+  "name": "nat_add_assoc_all",
+  "difficulty": "easy",
+  "imports": [],
+  "statement": "theorem nat_add_assoc_all : ∀ a b c : Nat, (a + b) + c = a + (b + c)",
+  "tags": ["easy", "arithmetic", "associativity"]
+}

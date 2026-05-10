@@ -36,6 +36,8 @@ structure Graph (V : Type u) where
 
 namespace Graph
 
+
+
 variable {V : Type u} (G : Graph V)
 
 /-- Convenience alias for the edge relation. Reads as "u is adjacent to v". -/
