@@ -1,4 +1,5 @@
 # scripts/autoresearch.py
+import os
 import subprocess
 import json
 import re
@@ -109,6 +110,38 @@ def find_first_tactic_sorry(content):
     return None, None
 
 
+def _lake_run(file_path: str, timeout: int):
+    """
+    Run `lake env lean <file>` from the nearest lakefile ancestor.
+    Handles sub-projects (e.g. physlib-master) that have their own lakefile.
+    """
+    directory = os.path.dirname(os.path.abspath(file_path))
+    cwd = os.getcwd()
+    while True:
+        if (os.path.exists(os.path.join(directory, "lakefile.lean"))
+                or os.path.exists(os.path.join(directory, "lakefile.toml"))):
+            cwd = directory
+            break
+        parent = os.path.dirname(directory)
+        if parent == directory:
+            break
+        directory = parent
+    lean_arg = os.path.relpath(os.path.abspath(file_path), cwd)
+    return subprocess.run(
+        ["lake", "env", "lean", lean_arg],
+        capture_output=True, text=True, timeout=timeout, cwd=cwd,
+    )
+
+
+def _has_lean_error(output: str, returncode: int) -> bool:
+    """True only for real compile failures. Sorry warnings are not errors."""
+    return (
+        returncode != 0
+        or bool(re.search(r':\d+:\d+: error:', output))
+        or bool(re.search(r'unsolved goals', output))
+    )
+
+
 def get_lean_goal_state(file_path, content):
     start, indent = find_first_tactic_sorry(content)
     if start is None:
@@ -116,10 +149,7 @@ def get_lean_goal_state(file_path, content):
     modified = content[:start] + f"{indent}trace_state\n" + content[start:]
     write_file(file_path, modified)
     try:
-        result = subprocess.run(
-            ["lake", "env", "lean", file_path],
-            capture_output=True, text=True, timeout=FAST_TIMEOUT
-        )
+        result = _lake_run(file_path, FAST_TIMEOUT)
         return _parse_goal_from_output(result.stderr + result.stdout)
     except subprocess.TimeoutExpired:
         return ""
@@ -150,18 +180,9 @@ def _parse_goal_from_output(output):
 
 def check_file_fast(file_path):
     try:
-        result = subprocess.run(
-            ["lake", "env", "lean", file_path],
-            capture_output=True, text=True, timeout=FAST_TIMEOUT
-        )
+        result = _lake_run(file_path, FAST_TIMEOUT)
         output = result.stderr + result.stdout
-        has_error = (
-            result.returncode != 0
-            or bool(re.search(r':\d+:\d+: error:', output))
-            or bool(re.search(r'unsolved goals', output))
-            or bool(re.search(r'declaration uses sorry', output))
-        )
-        return not has_error, output
+        return not _has_lean_error(output, result.returncode), output
     except subprocess.TimeoutExpired:
         return False, "timeout"
 
@@ -172,16 +193,10 @@ def measure_compile_time(file_path, content=None):
         write_file(file_path, content)
     t0 = time.time()
     try:
-        result = subprocess.run(
-            ["lake", "env", "lean", file_path],
-            capture_output=True, text=True, timeout=180
-        )
+        result = _lake_run(file_path, 180)
         elapsed = time.time() - t0
         out = result.stderr + result.stdout
-        if (result.returncode != 0
-                or re.search(r':\d+:\d+: error:', out)
-                or re.search(r'unsolved goals', out)
-                or re.search(r'declaration uses sorry', out)):
+        if _has_lean_error(out, result.returncode):
             return float('inf')
         return elapsed
     except subprocess.TimeoutExpired:
@@ -529,12 +544,14 @@ def optimize_loop(target_file):
     print("Measuring baseline compile time...")
     baseline = measure_compile_time(target_file, content)
     if baseline == float('inf'):
-        print("ERROR: file does not compile cleanly. Fix errors before optimizing.")
+        print("ERROR: file has real compile errors. Fix them before optimizing.")
         return
     print(f"Baseline: {baseline:.2f}s\n")
 
     blocks = find_proof_blocks(content)
-    print(f"Found {len(blocks)} tactic proof blocks to consider.\n")
+    sorry_count = sum(1 for b in blocks if SORRY_RE.search(b['proof_body']))
+    complete = len(blocks) - sorry_count
+    print(f"Found {len(blocks)} tactic proof blocks: {complete} complete, {sorry_count} with sorry (will skip).\n")
 
     # Use declaration text as stable key so line numbers stay valid after replacements
     decl_keys = [b['declaration'] for b in blocks]
@@ -552,6 +569,10 @@ def optimize_loop(target_file):
 
         print(f"[{idx + 1}/{len(decl_keys)}] {block['declaration'][:70]}")
         print(f"  Current proof:\n    {block['proof_body'].strip()[:100]}")
+
+        if SORRY_RE.search(block['proof_body']):
+            print("  [SKIP] proof contains sorry — leaving as-is\n")
+            continue
 
         candidates = get_speed_candidates(target_file, current_content, block, current_time)
         if not candidates:
