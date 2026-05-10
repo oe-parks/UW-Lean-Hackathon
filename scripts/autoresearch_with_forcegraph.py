@@ -6,6 +6,7 @@ import re
 import sys
 import time
 import glob
+import datetime
 import anthropic
 import openai as openai_lib
 
@@ -1167,6 +1168,21 @@ def optimize_loop(target_file):
     print(f"=== autoresearch [--optimize] [{mode}] ===")
     print(f"Target: {target_file}\n")
 
+    # Open log file
+    os.makedirs("logs", exist_ok=True)
+    stem = os.path.splitext(os.path.basename(target_file))[0]
+    ts   = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    log_path = os.path.join("logs", f"optimize-{stem}-{ts}.md")
+    log = open(log_path, "w")
+
+    def _log(text: str):
+        log.write(text)
+        log.flush()
+
+    _log(f"# Optimize log — `{target_file}`\n\n")
+    _log(f"**Date:** {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}  \n")
+    _log(f"**Backend:** {mode}  \n\n---\n\n")
+
     content = read_file(target_file)
 
     print("Measuring baseline compile time...")
@@ -1192,6 +1208,12 @@ def optimize_loop(target_file):
     print(f"Found {len(blocks)} tactic proof blocks: "
           f"{complete} optimisable, {sorry_count} with sorry, "
           f"{error_count} overlapping errors (all skipped).\n")
+
+    _log(f"**Baseline:** {baseline:.2f}s")
+    if baseline_errors:
+        _log(f" *(file has errors at lines {sorted(baseline_errors)})*")
+    _log(f"  \n**Blocks:** {len(blocks)} total — "
+         f"{complete} optimisable, {sorry_count} sorry, {error_count} error  \n\n---\n\n")
 
     # Use declaration text as stable key so line numbers stay valid after replacements
     decl_keys = [b['declaration'] for b in blocks]
@@ -1279,6 +1301,7 @@ def optimize_loop(target_file):
             pct_faster = time_saved / current_time * 100 if current_time > 0 else 0
             total_time_saved += time_saved
             blocks_improved += 1
+            old_body = block['proof_body']
             current_content = best_content
             current_time = best_time
             write_file(target_file, current_content)
@@ -1287,6 +1310,28 @@ def optimize_loop(target_file):
                 f"score {orig_score:.2f} → {best_score:.2f}  |  "
                 f"{baseline:.2f}s → {best_time:.2f}s  ({pct_faster:+.1f}%)\n"
             )
+            new_body_text = next(
+                (b['proof_body'] for b in find_proof_blocks(current_content)
+                 if b['declaration'] == decl_key),
+                chosen_opt_r['short'] if chosen_opt_r else "—"
+            )
+            _log(f"## [{blocks_improved}] `{decl_key[:80]}`\n\n")
+            _log(f"**Score:** {orig_score:.2f} → {best_score:.2f}  \n")
+            _log(f"**Time:** {baseline:.2f}s → {best_time:.2f}s ({pct_faster:+.1f}%)  \n\n")
+            _log(f"**Before:**\n```lean\n{old_body.strip()}\n```\n\n")
+            _log(f"**After:**\n```lean\n{new_body_text.strip()}\n```\n\n")
+            if chosen_opt_r:
+                others = [r for r in opt_results if r['status'] == 'pass' and r is not chosen_opt_r]
+                _log(f"**Why chosen:** best quality score ({best_score:.2f}).  \n")
+                if others:
+                    _log("**Alternatives considered:**  \n")
+                    for o in others:
+                        qdiff = o['score'] - best_score
+                        tdiff = best_time - o['compile_time']
+                        _log(f"- `{o['short'][:60]}` — score {o['score']:.2f} "
+                             f"({qdiff:+.2f} vs chosen), "
+                             f"t={o['compile_time']:.2f}s ({tdiff:+.2f}s vs chosen)  \n")
+            _log("\n---\n\n")
         else:
             write_file(target_file, current_content)
             print(f"  → No improvement found.\n")
@@ -1298,6 +1343,17 @@ def optimize_loop(target_file):
     print(f"Baseline runtime:  {baseline:.2f}s")
     print(f"Final runtime:     {current_time:.2f}s")
     print(f"Time saved:        {total_time_saved:.2f}s  ({overall_pct:.1f}% faster)")
+
+    _log(f"## Summary\n\n")
+    _log(f"| | |\n|---|---|\n")
+    _log(f"| Blocks reviewed | {len(decl_keys)} |\n")
+    _log(f"| Blocks improved | {blocks_improved} |\n")
+    _log(f"| Baseline runtime | {baseline:.2f}s |\n")
+    _log(f"| Final runtime | {current_time:.2f}s |\n")
+    _log(f"| Time saved | {total_time_saved:.2f}s ({overall_pct:.1f}% faster) |\n")
+    log.close()
+    print(f"Log written → {log_path}")
+
     write_viz_html()
 
 
