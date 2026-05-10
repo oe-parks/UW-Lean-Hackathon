@@ -152,10 +152,10 @@ class AugmentingPath(Scene):
 
     def make_node(self, n):
         pos = to_manim_pos(*NODE_POSITIONS[n])
-        c = Circle(radius=0.30, color=C_NODE, fill_color=C_NODE,
+        c = Circle(radius=0.22, color=C_NODE, fill_color=C_NODE,
                    fill_opacity=1, stroke_width=0)
         c.move_to(pos)
-        lbl = Text(str(n), font_size=20, color=self._label_color(C_NODE), weight=BOLD)
+        lbl = Text(str(n), font_size=16, color=self._label_color(C_NODE), weight=BOLD)
         lbl.move_to(pos)
         return VGroup(c, lbl)
 
@@ -618,5 +618,9 @@ class AugmentingPath(Scene):
             *[self.get_edge(edges, u, v).animate.set_color(C_MATCHED).set_stroke(width=6)
               for u, v in FINAL_MATCHING],
             run_time=0.5,
+        )
+        self.play(
+            *[FadeOut(nodes[n][1]) for n in nodes],
+            run_time=0.4,
         )
         self.wait(2.5)
