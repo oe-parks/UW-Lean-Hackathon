@@ -396,7 +396,15 @@ theorem bfsLean_optimal (G : Toy.Graph V) (ctx : Context V)
     have h_d_eq : d = 0 := bfsLean_dist_unique ctx h_ctx_nodup s h_in
                               (bfsLean_start_in_result ctx s)
     omega
-  · -- General case requires BFS-layer argument. Left as sorry.
-    sorry
+  · -- v ≠ s. Subcase d' = 0 is impossible (walk of length 0 ⇒ v = s).
+    by_cases h_d'_zero : d' = 0
+    · exfalso
+      subst h_d'_zero
+      obtain ⟨w, hLen⟩ := h_walk
+      cases w with
+      | nil => exact h_v_eq_s rfl
+      | cons _ _ => simp [Toy.Walk.length] at hLen
+    · -- v ≠ s and d' ≥ 1: needs the full BFS-layer argument.
+      sorry
 
 end Hackathon.GraphIR.BFS

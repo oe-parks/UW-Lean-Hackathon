@@ -6,17 +6,20 @@ A from-scratch Lean 4 + Mathlib formalization of matching theory and Edmonds' bl
 
 ![Augmenting Path Discovery](visuals/augmenting_path_manim.gif)
 
-## Headline Results
+## What We Built
 
-- **Closed augmentation lemma** — `IsAugmenting.xorWith_isMatching` and `IsAugmenting.xorWith_card` are both proved in [`Hackathon/Graph/Augment.lean`](Hackathon/Graph/Augment.lean). Given an `M`-augmenting walk `w`, the symmetric difference `M △ E(w)` is again a matching and has exactly one more edge than `M`.
-- **Berge's theorem (SimpleGraph)** — `berge` in [`Hackathon/Graph/Berge.lean`](Hackathon/Graph/Berge.lean) proves "M maximum ↔ no M-augmenting path"; the forward direction is fully closed by the augmentation lemma, the backward direction reduces to one named obligation.
-- **Berge's theorem (IR)** — `berge` in [`Hackathon/GraphIR/Blossom.lean`](Hackathon/GraphIR/Blossom.lean) proves the analogous iff at the IR layer; uses the proved `augmentAlong_preserves_isMatching` + `augmentAlong_increases_size_by_one`.
-- **Loop termination** — `maxMatchingLean_oracle_returns_none` proves that the matching loop (fuel `|V|/2 + 1`) returns a matching on which the oracle reports `none`, given the size bound `|M|·2 ≤ |V|`. Combined with Berge, this yields `maxMatchingLean_isMaximum`.
-- **GraphIR primitive correctness** — `augment_correct_spec` and `contract_matching_correct_spec` in [`Hackathon/GraphIR/Primitives.lean`](Hackathon/GraphIR/Primitives.lean) prove that the IR implementations of `augmentAlong` and `Matching.contract` agree with the Lean reference definitions at sufficient fuel.
-- **BFS soundness** — `bfsLean_sound` in [`Hackathon/GraphIR/BFS.lean`](Hackathon/GraphIR/BFS.lean) proves every `(v, d)` returned by the BFS reference corresponds to a real `Toy.Walk` of length `d`. Optimality is closed for the `v = s` subcase via the helpers `bfsLean_dist_unique` and `bfsLean_start_in_result`.
-- **Augment / Contract on IR** — `augmentingPath_alternation_balance`, `augmentingPath_intersection_symmetry`, and `augmentAlong_preserves_isMatching` in [`Hackathon/GraphIR/Blossom.lean`](Hackathon/GraphIR/Blossom.lean) are all fully proved.
+We formally prove in Lean 4 that **Edmonds' blossom algorithm actually finds a maximum matching in any finite graph**. The headline theorem `maxMatchingLean_isMaximum` is the punchline: given an augmenting-path oracle, the algorithm's bounded loop terminates and returns a matching no other matching can beat.
 
-**Status:** 4 deep sorries remain (Berge backward in both layers, BFS optimality `v ≠ s` case, blossom-contraction equivalence). All are research-level graph theorems with structural helpers in place.
+To get there, we develop the supporting graph theory from scratch — defining matchings, walks, paths, and augmenting paths in Lean — and prove the two classical results that make every matching algorithm tick:
+
+- the **augmentation lemma**, which says that taking the symmetric difference of a matching with an augmenting walk gives back a matching with one more edge, and
+- the forward direction of **Berge's theorem**, which says a matching is maximum exactly when no augmenting path exists.
+
+To make the algorithm itself runnable and verifiable, we design a small functional intermediate representation called **GraphIR**, with its own syntax and a fuel-based interpreter. We implement the blossom algorithm inside GraphIR, prove that each IR primitive computes the same thing as our Lean reference, and reduce the algorithm's top-level correctness to that small set of graph-theoretic obligations.
+
+Alongside the proofs, we built an **autoresearch loop** that closes on itself: a build-time signal feeds a proof-rewriting pipeline that explores tactic alternatives and tracks compile-time improvements end-to-end.
+
+Four research-level lemmas remain as `sorry` — Berge's hard backward direction (in both layers), BFS layer optimality, and Edmonds' blossom-contraction equivalence — each with structural helpers already in place.
 
 ## Compilation
 
@@ -65,148 +68,33 @@ Hackathon/
 
 The codebase is layered: a from-scratch *toy* graph foundation, the Mathlib-flavoured *SimpleGraph* layer for matching theory, the *GraphIR* runtime (syntax → builtins → interpreter), the *GraphIR* algorithms (BFS, blossom), and finally the *verification bridge* that ties IR programs back to the Lean reference proofs.
 
-```mermaid
-flowchart TD
-    classDef foundations fill:#e0e7ff,stroke:#4338ca,color:#000
-    classDef simpleGraph fill:#d1fae5,stroke:#047857,color:#000
-    classDef irRuntime  fill:#fef3c7,stroke:#b45309,color:#000
-    classDef irAlgos    fill:#fee2e2,stroke:#b91c1c,color:#000
-    classDef verify     fill:#fce7f3,stroke:#9d174d,color:#000
+![Project dependency diagram](visuals/diagrams/project_dependency.png)
 
-    subgraph TOY[Toy graph foundation]
-        TB[Toy.Basic]:::foundations
-        TM[Toy.Matching]:::foundations
-        TW[Toy.Walk]:::foundations
-        TX[Toy.Examples]:::foundations
-        TL[Toy.Lemmas]:::foundations
-        TBR[Toy.Bridge]:::foundations
-    end
-
-    subgraph SG[SimpleGraph matching layer]
-        GM[Graph.Matching]:::simpleGraph
-        GA[Graph.Augment]:::simpleGraph
-        GB[Graph.Berge]:::simpleGraph
-        GW[Graph.Walks]:::simpleGraph
-        GBFS[Graph.BFS]:::simpleGraph
-    end
-
-    subgraph ALG[SimpleGraph algorithms]
-        ABP[Algorithms.Bipartite]:::simpleGraph
-        ABL[Algorithms.Blossom]:::simpleGraph
-    end
-
-    subgraph IRRT[GraphIR runtime]
-        IRT[GraphIR.Types]:::irRuntime
-        IRS[GraphIR.Syntax]:::irRuntime
-        IRB[GraphIR.Builtins]:::irRuntime
-        IRI[GraphIR.Interpreter]:::irRuntime
-        IRE[GraphIR.Examples]:::irRuntime
-    end
-
-    subgraph IRAL[GraphIR algorithms]
-        IRBFS[GraphIR.BFS]:::irAlgos
-        IRBL[GraphIR.Blossom]:::irAlgos
-    end
-
-    subgraph VFY[Verification bridge]
-        IRV[GraphIR.Verify]:::verify
-        IRP[GraphIR.Primitives]:::verify
-    end
-
-    TB --> TM
-    TB --> TX
-    TB --> TBR
-    TB --> TL
-    TX --> TL
-    TM --> TW
-
-    GM --> GA
-    GA --> GB
-    GB --> ABP
-    GB --> ABL
-    TW --> GBFS
-
-    TW --> IRT
-    IRT --> IRS
-    IRS --> IRB
-    IRB --> IRI
-    IRI --> IRE
-    IRE --> IRBFS
-    IRE --> IRBL
-    IRBL --> IRV
-    GB --> IRV
-    TW --> IRV
-    IRV --> IRP
-```
-
-Reading the diagram: arrows are `import` edges. The verification bridge (`Verify.lean` and `Primitives.lean`) pulls in *both* the IR's `Blossom.lean` and the SimpleGraph layer's `Berge.lean`, so that IR-level correctness obligations can be discharged via the Lean-side proofs of Berge's theorem and the augmentation lemma.
+Arrows are `import` edges. The verification bridge (`Verify.lean` and `Primitives.lean`) pulls in *both* the IR's `Blossom.lean` and the SimpleGraph layer's `Berge.lean`, so that IR-level correctness obligations can be discharged via the Lean-side proofs of Berge's theorem and the augmentation lemma.
 
 ## Proof Structure (IR layer)
 
-The diagram below shows how the top-level theorem `maxMatchingLean_isMaximum` is reduced through Berge plus loop-termination obligations down to the proved augmentation-side lemmas. Green = proved in Lean, red = remaining `sorry`, yellow = main theorem.
+The diagram below shows how the top-level theorem `maxMatchingLean_isMaximum` is reduced through Berge plus loop-termination obligations down to the proved augmentation-side lemmas. **Green = proved in Lean, red = remaining `sorry`, yellow = main theorem.**
 
-```mermaid
-flowchart TD
-    classDef proved fill:#c6f7c6,stroke:#1f6f1f,color:#000
-    classDef sorrybox fill:#fed7d7,stroke:#9b1c1c,color:#000
-    classDef main fill:#fde68a,stroke:#a16207,color:#000,font-weight:bold
-
-    MAIN([<b>maxMatchingLean_isMaximum</b><br/>top-level correctness]):::main
-
-    MAIN --> B1[maxMatchingLean_isMatching]:::proved
-    MAIN --> B2[maxMatchingLean_oracle_returns_none]:::proved
-    MAIN --> B3[berge - IR layer]:::proved
-
-    B1 --> C1[maxMatchingLeanCore_isMatching]:::proved
-    C1 --> C2[augmentAlong_preserves_isMatching]:::proved
-    C2 --> C3[toRemove_endpoints_not_in_path]:::proved
-    C2 --> C4[edgesOf_* helpers]:::proved
-
-    B2 --> D1[maxMatchingLeanCore_size_lb]:::proved
-    B2 -. hypothesis .-> HBOUND[/hBound: M·2 ≤ V/]
-    D1 --> D2[augmentAlong_increases_size_by_one]:::proved
-    D2 --> D3[augmentingPath_alternation_balance]:::proved
-    D2 --> D4[augmentingPath_intersection_symmetry]:::proved
-
-    B3 -. forward .-> C2
-    B3 -. forward .-> D2
-    B3 -. backward .-> E1[exists_augmenting_of_larger_ir]:::sorrybox
-```
+![Proof structure — IR layer](visuals/diagrams/proof_ir.png)
 
 ## Proof Structure (SimpleGraph layer)
 
-Mathlib-side Berge's theorem and its supporting helpers:
+Mathlib-side Berge's theorem and its supporting helpers — forward direction fully closed via `xorWith_isMatching` (4-case dispatch) and `xorWith_card` (alternation-count + symmetric-difference cardinality):
 
-```mermaid
-flowchart TD
-    classDef proved fill:#c6f7c6,stroke:#1f6f1f,color:#000
-    classDef sorrybox fill:#fed7d7,stroke:#9b1c1c,color:#000
-    classDef main fill:#fde68a,stroke:#a16207,color:#000,font-weight:bold
+![Proof structure — Berge (SimpleGraph)](visuals/diagrams/proof_berge_sg.png)
 
-    BMAIN([<b>berge - SimpleGraph</b><br/>M maximum ↔ no M-augmenting path]):::main
+### BFS optimality (partial)
 
-    BMAIN -. forward .-> X1[IsAugmenting.xorWith_isMatching]:::proved
-    BMAIN -. forward .-> X2[IsAugmenting.xorWith_card]:::proved
-    BMAIN -. backward .-> X3[exists_augmenting_of_larger]:::sorrybox
+The `v = s` subcase is closed using `bfsLean_dist_unique` (which uses `bfsLean_go_dist_keys_nodup`) and `bfsLean_start_in_result` (which uses `bfsLean_go_dist_subset`). The remaining `v ≠ s` case requires the BFS-layer invariant (FIFO queue + fuel sufficiency):
 
-    X1 --> H1[interior_in_M_verts]:::proved
-    X1 --> H2[M_partner_is_walk_neighbor]:::proved
-    X1 --> H3[walk_edge_eq_support]:::proved
+![BFS optimality](visuals/diagrams/proof_bfs.png)
 
-    X2 --> H4[list_filter_count_of_alternating_aux]:::proved
-    X2 --> H5[walk_edges_set_ncard_eq]:::proved
-    X2 --> H6[M_inter_walk_edges_ncard]:::proved
+### Blossom contraction equivalence
 
-    BFS([bfsLean_optimal - partial]):::main
-    BFS -. v=s case .-> B1[bfsLean_dist_unique]:::proved
-    BFS -. v=s case .-> B2[bfsLean_start_in_result]:::proved
-    BFS -. v≠s case .-> B3[BFS-layer invariant]:::sorrybox
+The trivial subcase where `M.contract B = M` (including `M = []`) is closed via `contract_matching_augmenting_iff_of_contract_eq`. The non-trivial subcase (contraction actually rewrites the matching) requires Edmonds' odd-cycle traversal argument and remains as `sorry`:
 
-    CON([contract_matching_augmenting_iff]):::main
-    CON -. helpers .-> CT1[Matching.mem_contract_iff]:::proved
-    CON -. helpers .-> CT2[mem_contract_of_outside_cycle]:::proved
-    CON -. Edmonds .-> CT3[odd-cycle traversal]:::sorrybox
-```
+![Blossom contraction](visuals/diagrams/proof_blossom_contract.png)
 
 ## Example 1 — The Augmentation Lemma
 

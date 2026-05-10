@@ -1,0 +1,21 @@
+digraph BfsOptimal {
+  rankdir=TB;
+  bgcolor="white";
+  graph [fontname="Helvetica", fontsize=12, nodesep=0.35, ranksep=0.55];
+  node  [fontname="Helvetica", fontsize=11, shape=box, style="rounded,filled", margin="0.2,0.1"];
+  edge  [fontname="Helvetica", fontsize=10, color="#444444", arrowsize=0.7];
+
+  BFS [label=<<B>bfsLean_optimal</B><BR/><FONT POINT-SIZE="10">distance d is the shortest walk length</FONT>>,
+       fillcolor="#fde68a", color="#a16207", style="rounded,filled,bold"];
+  B1 [label="bfsLean_dist_unique", fillcolor="#c6f7c6", color="#1f6f1f"];
+  B2 [label="bfsLean_start_in_result", fillcolor="#c6f7c6", color="#1f6f1f"];
+  B4 [label="bfsLean_go_dist_keys_nodup", fillcolor="#c6f7c6", color="#1f6f1f"];
+  B5 [label="bfsLean_go_dist_subset", fillcolor="#c6f7c6", color="#1f6f1f"];
+  B3 [label="BFS-layer invariant\n(v ≠ s, d' ≥ 1 case)", fillcolor="#fed7d7", color="#9b1c1c"];
+
+  BFS -> B1 [style=dashed, label="v = s case"];
+  BFS -> B2 [style=dashed, label="v = s case"];
+  BFS -> B3 [style=dashed, label="v ≠ s, d' ≥ 1"];
+  B1 -> B4;
+  B2 -> B5;
+}

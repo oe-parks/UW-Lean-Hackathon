@@ -1,0 +1,30 @@
+digraph BergeSG {
+  rankdir=TB;
+  bgcolor="white";
+  graph [fontname="Helvetica", fontsize=12, nodesep=0.35, ranksep=0.55];
+  node  [fontname="Helvetica", fontsize=11, shape=box, style="rounded,filled", margin="0.2,0.1"];
+  edge  [fontname="Helvetica", fontsize=10, color="#444444", arrowsize=0.7];
+
+  BMAIN [label=<<B>berge   (SimpleGraph)</B><BR/><FONT POINT-SIZE="10">M maximum ↔ no M-augmenting path</FONT>>,
+         fillcolor="#fde68a", color="#a16207", style="rounded,filled,bold"];
+  X1 [label="IsAugmenting.xorWith_isMatching", fillcolor="#c6f7c6", color="#1f6f1f"];
+  X2 [label="IsAugmenting.xorWith_card", fillcolor="#c6f7c6", color="#1f6f1f"];
+  X3 [label="exists_augmenting_of_larger", fillcolor="#fed7d7", color="#9b1c1c"];
+  H1 [label="interior_in_M_verts", fillcolor="#c6f7c6", color="#1f6f1f"];
+  H2 [label="M_partner_is_walk_neighbor", fillcolor="#c6f7c6", color="#1f6f1f"];
+  H3 [label="walk_edge_eq_support", fillcolor="#c6f7c6", color="#1f6f1f"];
+  H4 [label="list_filter_count_of_alternating_aux", fillcolor="#c6f7c6", color="#1f6f1f"];
+  H5 [label="walk_edges_set_ncard_eq", fillcolor="#c6f7c6", color="#1f6f1f"];
+  H6 [label="M_inter_walk_edges_ncard", fillcolor="#c6f7c6", color="#1f6f1f"];
+
+  BMAIN -> X1 [style=dashed, label="forward"];
+  BMAIN -> X2 [style=dashed, label="forward"];
+  BMAIN -> X3 [style=dashed, label="backward"];
+
+  X1 -> H1;
+  X1 -> H2;
+  X1 -> H3;
+  X2 -> H4;
+  X2 -> H5;
+  X2 -> H6;
+}
