@@ -427,7 +427,9 @@ private lemma alt_balance_aux
         rw [hr] at hAltRest
         -- hAltRest : IsAlternatingPath M (w :: x :: rest')
         have hRecLen : (w :: x :: rest').length = n - 2 := by
-          simp at hLen'; omega
+          change (w :: x :: rest').length = n - 2
+          simp only [List.length_cons] at hLen'
+          omega
         have hRecGe : 2 ≤ n - 2 := by simp at hLen'; omega
         have hLt : n - 2 < n := by omega
         have hRecUnm : ∀ y, (w :: x :: rest').getLast? = some y →
@@ -439,8 +441,7 @@ private lemma alt_balance_aux
           have hNonempty : (w :: x :: rest') ≠ [] := List.cons_ne_nil _ _
           rw [List.getLast?_eq_getLast hNonempty] at hY
           have hY' : y = (w :: x :: rest').getLast hNonempty := by
-            injection hY with hY'
-            exact hY'.symm
+            have hY' : y = (w :: x :: rest').getLast hNonempty := Option.some.inj hY |>.symm
           subst hY'
           have hOuterNE : (u :: v :: w :: x :: rest') ≠ [] := List.cons_ne_nil _ _
           rw [List.getLast?_eq_getLast hOuterNE]

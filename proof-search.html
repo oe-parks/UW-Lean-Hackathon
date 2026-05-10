@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>autoresearch decision trace</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #0d1117; color: #e6edf3; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+
+    #header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+      display: flex; align-items: center; gap: 16px;
+      padding: 10px 18px;
+      background: rgba(13,17,23,0.92); backdrop-filter: blur(8px);
+      border-bottom: 1px solid #30363d;
+    }
+    #header h1 { font-size: 15px; font-weight: 600; color: #e6edf3; white-space: nowrap; }
+    #header .meta { font-size: 12px; color: #7d8590; white-space: nowrap; }
+    #header .spacer { flex: 1; }
+    #legend { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #adbac7; }
+    .leg-dot { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.15); flex-shrink:0; }
+    #controls { display: flex; gap: 8px; }
+    button {
+      background: #21262d; border: 1px solid #30363d; color: #adbac7;
+      border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer;
+    }
+    button:hover { background: #30363d; color: #e6edf3; }
+
+    #canvas-wrap { position: fixed; top: 48px; left: 0; right: 0; bottom: 0; }
+    svg { width: 100%; height: 100%; }
+
+    .link { stroke: #444c56; stroke-opacity: 0.7; fill: none; }
+    .link-label { font-size: 10px; fill: #7d8590; pointer-events: none; }
+
+    .node-group { cursor: pointer; }
+    .node-rect { rx: 7; stroke-width: 1.5; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5)); }
+    .node-kind { font-size: 10px; fill: #7d8590; font-family: ui-monospace,monospace; }
+    .node-label { font-size: 11px; fill: #e6edf3; font-weight: 600; }
+    .node-status { font-size: 10px; font-family: ui-monospace,monospace; }
+    .node-timing { font-size: 10px; fill: #7d8590; font-family: ui-monospace,monospace; }
+    .node-group:hover .node-rect { stroke-opacity: 1 !important; stroke-width: 2; }
+
+    #tooltip {
+      position: fixed; z-index: 100; pointer-events: none;
+      background: #161b22; border: 1px solid #30363d; border-radius: 8px;
+      padding: 12px 14px; max-width: 420px; font-size: 12px; line-height: 1.55;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      display: none;
+    }
+    #tooltip .tt-kind { color: #7d8590; font-family: monospace; font-size: 11px; margin-bottom: 4px; }
+    #tooltip .tt-label { color: #e6edf3; font-weight: 600; margin-bottom: 6px; word-break: break-word; }
+    #tooltip .tt-status { font-weight: 700; font-family: monospace; margin-bottom: 6px; }
+    #tooltip table { border-collapse: collapse; width: 100%; margin-top: 6px; }
+    #tooltip th { text-align: right; color: #7d8590; padding: 2px 8px 2px 0; vertical-align: top; white-space: nowrap; font-weight: 400; }
+    #tooltip td { color: #adbac7; padding: 2px 0; word-break: break-word; max-width: 280px; }
+    #tooltip pre { background: #0d1117; border-radius: 4px; padding: 6px 8px; margin-top: 4px; white-space: pre-wrap; font-size: 11px; color: #adbac7; max-height: 160px; overflow-y: auto; }
+  </style>
+</head>
+<body>
+<div id="header">
+  <h1>autoresearch decision trace</h1>
+  <span class="meta">proof-search &bull; 10 nodes &bull; 7 edges</span>
+  <div class="spacer"></div>
+  <div id="legend">
+    <div class="leg"><div class="leg-dot" style="background:#3fb950;"></div>Chosen ★</div>
+    <div class="leg"><div class="leg-dot" style="background:#f0883e;"></div>Search root</div>
+    <div class="leg"><div class="leg-dot" style="background:#388bfd;"></div>Passing</div>
+    <div class="leg"><div class="leg-dot" style="background:#da3633;"></div>Failed</div>
+    <div class="leg"><div class="leg-dot" style="background:#444c56;"></div>Banned</div>
+  </div>
+  <div id="controls">
+    <button id="btn-reset">Reset view</button>
+    <button id="btn-pin">Unpin all</button>
+  </div>
+</div>
+
+<div id="canvas-wrap"><svg id="graph"></svg></div>
+<div id="tooltip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+const GRAPH = {"nodes": [{"id": 1, "kind": "search-root", "label": "Proof search (all failed)", "status": "search_root", "attrs": {}}, {"id": 2, "kind": "candidate", "label": "Looking at this problem, I need to prove that if `w` is an `", "status": "banned", "attrs": {}}, {"id": 3, "kind": "search-root", "label": "Proof search (all failed)", "status": "search_root", "attrs": {}}, {"id": 4, "kind": "candidate", "label": "intro v   simp only [xorWith, SimpleGraph.Subgraph.IsMatchin", "status": "banned", "attrs": {}}, {"id": 5, "kind": "candidate", "label": "simp only [SimpleGraph.Subgraph.IsMatching, xorWith]   intro", "status": "banned", "attrs": {}}, {"id": 6, "kind": "candidate", "label": "constructor   \u00b7 intro v hv     simp only [xorWith, Set.mem_u", "status": "banned", "attrs": {}}, {"id": 7, "kind": "candidate", "label": "unfold SimpleGraph.Subgraph.IsMatching xorWith   intro v hv ", "status": "banned", "attrs": {}}, {"id": 8, "kind": "candidate", "label": "-- Unfold everything and work from IsAugmenting hypotheses  ", "status": "banned", "attrs": {}}, {"id": 9, "kind": "search-root", "label": "Proof search (all failed)", "status": "search_root", "attrs": {}}, {"id": 10, "kind": "candidate", "label": "Looking at this problem, I need to prove that `xorWith M w` ", "status": "banned", "attrs": {}}], "edges": [{"from": 1, "to": 2, "label": "", "is_chosen": false}, {"from": 3, "to": 4, "label": "", "is_chosen": false}, {"from": 3, "to": 5, "label": "", "is_chosen": false}, {"from": 3, "to": 6, "label": "", "is_chosen": false}, {"from": 3, "to": 7, "label": "", "is_chosen": false}, {"from": 3, "to": 8, "label": "", "is_chosen": false}, {"from": 9, "to": 10, "label": "", "is_chosen": false}]};
+
+const STATUS_COLORS = {
+  pass_chosen: "#3fb950",
+  search_root: "#f0883e",
+  pass_other:  "#388bfd",
+  fail:        "#da3633",
+  banned:      "#444c56",
+};
+const STATUS_TEXT = {
+  pass_chosen: "#d2ffd8",
+  search_root: "#ffd8a8",
+  pass_other:  "#cae8ff",
+  fail:        "#ffdcd7",
+  banned:      "#adbac7",
+};
+const KIND_BG = {
+  search_root: "#161b22",
+  pass_chosen: "#1c2128",
+  pass_other:  "#1c2128",
+  fail:        "#161b22",
+  banned:      "#161b22",
+};
+
+function nodeColor(d) { return STATUS_COLORS[d.status] || "#555"; }
+function nodeBg(d)    { return KIND_BG[d.status]    || "#161b22"; }
+function statusTextColor(d) { return STATUS_TEXT[d.status] || "#adbac7"; }
+
+const nodeById = {};
+GRAPH.nodes.forEach(n => { nodeById[n.id] = n; });
+
+const nodes = GRAPH.nodes.map(n => ({
+  id: n.id,
+  kind: n.kind,
+  label: n.label,
+  status: n.status || "",
+  attrs: n.attrs || {},
+}));
+
+const links = GRAPH.edges.map(e => ({
+  source: e.from,
+  target: e.to,
+  label: e.label || "",
+  is_chosen: e.is_chosen || false,
+}));
+
+const svg = d3.select("#graph");
+const wrap = document.getElementById("canvas-wrap");
+
+function dims() { return { w: wrap.clientWidth, h: wrap.clientHeight }; }
+
+const defs = svg.append("defs");
+defs.append("marker")
+  .attr("id", "arrow")
+  .attr("viewBox", "0 -4 8 8")
+  .attr("refX", 8).attr("refY", 0)
+  .attr("markerWidth", 6).attr("markerHeight", 6)
+  .attr("orient", "auto")
+  .append("path")
+  .attr("d", "M0,-4L8,0L0,4")
+  .attr("fill", "#555");
+
+const g = svg.append("g");
+
+const zoom = d3.zoom()
+  .scaleExtent([0.08, 4])
+  .on("zoom", e => g.attr("transform", e.transform));
+svg.call(zoom);
+
+const {w, h} = dims();
+const sim = d3.forceSimulation(nodes)
+  .force("link", d3.forceLink(links).id(d => d.id).distance(180).strength(0.6))
+  .force("charge", d3.forceManyBody().strength(-600))
+  .force("center", d3.forceCenter(w / 2, h / 2))
+  .force("collide", d3.forceCollide(90))
+  .force("x", d3.forceX(w / 2).strength(0.04))
+  .force("y", d3.forceY(h / 2).strength(0.04));
+
+const linkSel = g.append("g").selectAll("line")
+  .data(links).join("line")
+  .attr("class", "link")
+  .attr("stroke", d => d.is_chosen ? "#3fb950" : "#444c56")
+  .attr("stroke-opacity", d => d.is_chosen ? 0.9 : 0.7)
+  .attr("stroke-width", d => d.is_chosen ? 2.5 : 1.5)
+  .attr("marker-end", "url(#arrow)");
+
+const linkLabelSel = g.append("g").selectAll("text")
+  .data(links.filter(l => l.label)).join("text")
+  .attr("class", "link-label")
+  .text(d => d.label);
+
+const NODE_W = 200, NODE_H = 72;
+
+const nodeSel = g.append("g").selectAll("g")
+  .data(nodes).join("g")
+  .attr("class", "node-group")
+  .call(d3.drag()
+    .on("start", (e, d) => {
+      if (!e.active) sim.alphaTarget(0.15).restart();
+      d.fx = d.x; d.fy = d.y;
+    })
+    .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
+    .on("end", (e, d) => {
+      if (!e.active) sim.alphaTarget(0);
+      // keep pinned
+    })
+  )
+  .on("mouseover", showTooltip)
+  .on("mousemove", moveTooltip)
+  .on("mouseout", hideTooltip);
+
+nodeSel.append("rect")
+  .attr("class", "node-rect")
+  .attr("x", -NODE_W / 2).attr("y", -NODE_H / 2)
+  .attr("width", NODE_W).attr("height", NODE_H)
+  .attr("rx", 7)
+  .attr("fill", d => nodeBg(d))
+  .attr("stroke", d => nodeColor(d))
+  .attr("stroke-opacity", 0.7);
+
+nodeSel.append("text")
+  .attr("class", "node-kind")
+  .attr("x", -NODE_W / 2 + 8).attr("y", -NODE_H / 2 + 14)
+  .text(d => d.kind);
+
+nodeSel.append("text")
+  .attr("class", "node-status")
+  .attr("x", NODE_W / 2 - 8).attr("y", -NODE_H / 2 + 14)
+  .attr("text-anchor", "end")
+  .attr("fill", d => statusTextColor(d))
+  .text(d => d.status === "pass_chosen" ? "★ CHOSEN" : d.status);
+
+nodeSel.each(function(d) {
+  const el = d3.select(this);
+  const words = d.label.split(/\s+/);
+  let line = "", lines = [];
+  for (const w of words) {
+    const test = line ? line + " " + w : w;
+    if (test.length > 26 && line) { lines.push(line); line = w; }
+    else { line = test; }
+  }
+  if (line) lines.push(line);
+  lines = lines.slice(0, 2);
+  lines.forEach((ln, i) => {
+    el.append("text")
+      .attr("class", "node-label")
+      .attr("x", 0).attr("y", (i - (lines.length - 1) / 2) * 15)
+      .attr("text-anchor", "middle")
+      .text(ln.length > 28 ? ln.slice(0, 26) + "\u2026" : ln);
+  });
+});
+
+nodeSel.append("text")
+  .attr("class", "node-timing")
+  .attr("x", 0).attr("y", NODE_H / 2 - 9)
+  .attr("text-anchor", "middle")
+  .text(d => {
+    const a = d.attrs;
+    if (a.seconds != null && a.saved_seconds != null)
+      return `${(+a.seconds).toFixed(2)}s  saved ${(+a.saved_seconds).toFixed(2)}s`;
+    if (a.seconds != null) return `${(+a.seconds).toFixed(2)}s`;
+    if (a.score != null)   return `score ${(+a.score).toFixed(2)}`;
+    return "";
+  });
+
+sim.on("tick", () => {
+  linkSel
+    .attr("x1", d => d.source.x)
+    .attr("y1", d => d.source.y)
+    .attr("x2", d => {
+      const dx = d.target.x - d.source.x, dy = d.target.y - d.source.y;
+      const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+      return d.target.x - (dx / dist) * (NODE_W / 2 + 10);
+    })
+    .attr("y2", d => {
+      const dx = d.target.x - d.source.x, dy = d.target.y - d.source.y;
+      const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+      return d.target.y - (dy / dist) * (NODE_H / 2 + 10);
+    });
+
+  linkLabelSel
+    .attr("x", d => (d.source.x + d.target.x) / 2)
+    .attr("y", d => (d.source.y + d.target.y) / 2 - 4);
+
+  nodeSel.attr("transform", d => `translate(${d.x},${d.y})`);
+});
+
+const tooltip = document.getElementById("tooltip");
+
+function fmtVal(v) {
+  if (v === null || v === undefined) return "";
+  if (typeof v === "number") return v.toFixed ? v.toFixed(4).replace(/\.?0+$/, "") : String(v);
+  return String(v);
+}
+
+function showTooltip(event, d) {
+  const rows = Object.entries(d.attrs)
+    .filter(([, v]) => v !== null && v !== "" && v !== undefined)
+    .map(([k, v]) => {
+      const val = fmtVal(v);
+      const cell = val.length > 80
+        ? `<td><pre>${escHtml(val)}</pre></td>`
+        : `<td>${escHtml(val)}</td>`;
+      return `<tr><th>${escHtml(k)}</th>${cell}</tr>`;
+    }).join("");
+
+  tooltip.innerHTML = `
+    <div class="tt-kind">${escHtml(d.kind)}</div>
+    <div class="tt-label">${escHtml(d.label)}</div>
+    ${d.status ? `<div class="tt-status" style="color:${statusTextColor(d)}">${escHtml(d.status)}</div>` : ""}
+    ${rows ? `<table>${rows}</table>` : ""}
+  `;
+  tooltip.style.display = "block";
+  moveTooltip(event);
+}
+
+function moveTooltip(event) {
+  const tw = tooltip.offsetWidth, th = tooltip.offsetHeight;
+  const bw = window.innerWidth, bh = window.innerHeight;
+  let x = event.clientX + 14, y = event.clientY + 14;
+  if (x + tw > bw - 8) x = event.clientX - tw - 14;
+  if (y + th > bh - 8) y = event.clientY - th - 14;
+  tooltip.style.left = x + "px";
+  tooltip.style.top  = y + "px";
+}
+
+function hideTooltip() { tooltip.style.display = "none"; }
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+document.getElementById("btn-reset").addEventListener("click", () => {
+  svg.transition().duration(600).call(
+    zoom.transform,
+    d3.zoomIdentity.translate(dims().w / 2, dims().h / 2).scale(0.8)
+      .translate(-dims().w / 2, -dims().h / 2)
+  );
+});
+
+document.getElementById("btn-pin").addEventListener("click", () => {
+  nodes.forEach(d => { d.fx = null; d.fy = null; });
+  sim.alphaTarget(0.2).restart();
+  setTimeout(() => sim.alphaTarget(0), 1200);
+});
+
+window.addEventListener("resize", () => {
+  const {w, h} = dims();
+  sim.force("center", d3.forceCenter(w / 2, h / 2))
+     .force("x", d3.forceX(w / 2).strength(0.04))
+     .force("y", d3.forceY(h / 2).strength(0.04));
+});
+</script>
+</body>
+</html>
