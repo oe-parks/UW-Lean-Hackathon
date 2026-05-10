@@ -71,6 +71,7 @@ theorem augmentOnce_isMatching
 /-- **Progress.** If `M` is not maximum, `augmentOnce` strictly increases size. -/
 theorem augmentOnce_card_succ
     (B : Bipartition G) {M : G.Subgraph} (hM : M.IsMatching)
+    (hMFin : M.edgeSet.Finite)
     (hNotMax : ¬ IsMaximumMatching M) :
     M.edgeSet.ncard < (augmentOnce B M).edgeSet.ncard := by
   -- M not maximum ⇒ by Berge, an augmenting path exists.
@@ -78,13 +79,13 @@ theorem augmentOnce_card_succ
     by_contra hNo
     push_neg at hNo
     apply hNotMax
-    exact (berge hM).mpr (fun w => hNo _ _ w)
+    exact (berge hM hMFin).mpr (fun w => hNo _ _ w)
   unfold augmentOnce
   rw [dif_pos hAugExists]
   -- Result is `xorWith M w` for some aug path w; size = |M| + 1.
   have hcard : (xorWith M hAugExists.choose_spec.choose_spec.choose).edgeSet.ncard
              = M.edgeSet.ncard + 1 :=
-    hAugExists.choose_spec.choose_spec.choose_spec.xorWith_card hM
+    hAugExists.choose_spec.choose_spec.choose_spec.xorWith_card hM hMFin
   omega
 
 /-- **Completeness.** If no augmenting path exists, the algorithm returns `M` itself

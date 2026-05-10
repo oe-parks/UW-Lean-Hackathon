@@ -81,7 +81,7 @@ The proof reduces to two named obligations:
   a strictly larger matching gives rise to an augmenting path),
   giving the backward direction.
 -/
-theorem berge {M : G.Subgraph} (hM : M.IsMatching) :
+theorem berge {M : G.Subgraph} (hM : M.IsMatching) (hMFin : M.edgeSet.Finite) :
     IsMaximumMatching M ↔
     ∀ {u v : V} (w : G.Walk u v), ¬ IsAugmenting M w := by
   constructor
@@ -90,7 +90,7 @@ theorem berge {M : G.Subgraph} (hM : M.IsMatching) :
     -- The augmentation lemma gives a matching of size |M| + 1.
     have h1 : (xorWith M w).IsMatching := hAug.xorWith_isMatching hM
     have h2 : (xorWith M w).edgeSet.ncard = M.edgeSet.ncard + 1 :=
-      hAug.xorWith_card hM
+      hAug.xorWith_card hM hMFin
     -- But maximality says |xorWith M w| ≤ |M|. Contradiction.
     have h3 : (xorWith M w).edgeSet.ncard ≤ M.edgeSet.ncard := hMax _ h1
     omega

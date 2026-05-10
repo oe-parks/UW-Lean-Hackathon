@@ -75,8 +75,9 @@ has odd length and "augmenting via symmetric difference" gives a
 matching one larger than `M`.
 -/
 structure IsAugmenting (M : G.Subgraph) {u v : V} (w : G.Walk u v) : Prop where
-  isPath        : w.IsPath
-  alternating   : IsAlternating M w
+  nonEmpty       : 1 ≤ w.length
+  isPath         : w.IsPath
+  alternating    : IsAlternating M w
   startUnmatched : IsUnmatched M u
   endUnmatched   : IsUnmatched M v
 
@@ -106,7 +107,7 @@ example {M : G.Subgraph} {u v : V} (w : G.Walk u v) (h : IsAugmenting M w)
     (hlen : 1 ≤ w.length) :
     Odd w.length := by
   classical
-  obtain ⟨_, hAlt, hu, hv⟩ := h
+  obtain ⟨_, _, hAlt, hu, hv⟩ := h
   have hLE : w.edges.length = w.length := w.length_edges
   have hpos : 0 < w.edges.length := by rw [hLE]; exact hlen
   have hEdgesNonempty : w.edges ≠ [] := List.length_pos_iff.mp hpos
