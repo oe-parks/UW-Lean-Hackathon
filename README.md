@@ -1,10 +1,11 @@
 # Hackathon
 
-Solution submitted by **XXX Team** for the **UW Lean Hackathon**.
+Solution submitted by **Team Blossom** for the **UW Lean Hackathon 2026**.
 
 ## Instruction to Compile
 
 The project is a standard Lake package (Lean 4.29.1 + Mathlib v4.29.1).
+
 
 ```bash
 # one-time setup: fetch dependencies and download the Mathlib build cache
@@ -22,11 +23,19 @@ To compile the project, measure compilation time, and report the number of `sorr
 
 The script prints a human-readable summary and also writes a machine-readable report to `build-report.json` (elapsed time, exit status, error count, `sorry`-warning count, per-file `sorry` breakdown). It is the primary signal consumed by the autoresearch loop described below.
 
+## Result
+
+Formalized the correctness and complexity of Edmond Blossom algorithm in Lean and invented a novel autoresearch pipeline that rewrite the proof tactics and improve the lean compilation time.
+
 ## Proof Graph Algorithm
 
 We formalize graph theory from the ground up in Lean 4. We start by defining the basic objects and theorems — vertices, edges, paths, matchings, girth, and so on — sufficient to state and reason about the matching problem.
 
 On top of that foundation, we design a small toy language: we give it an explicit syntax and a sound operational semantics tailored to expressing the blossom algorithm. We then implement Edmonds' blossom algorithm in that language and verify its correctness in Lean.
+
+## Theorem diagram 
+
+Here we show the dependency diagram of the whole theorem, and an animation of how these Lemmas/Theorems are used in real production.
 
 ![Augmenting Path Discovery](visuals/augmenting_path_manim.gif)
 
