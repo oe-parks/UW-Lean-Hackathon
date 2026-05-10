@@ -1659,6 +1659,23 @@ lemma Matching.mem_contract_of_outside_cycle
     · rw [if_neg]; intro h; rw [hu_not] at h; cases h
     · rw [if_neg]; intro h; rw [hv_not] at h; cases h
 
+/-- **Trivial subcase.** When the contraction is a no-op (`M.contract B = M`),
+    the iff is immediate. This subsumes degenerate blossoms (e.g. when `M`
+    is empty, or when no `M`-edge has an endpoint in the blossom's cycle). -/
+lemma contract_matching_augmenting_iff_of_contract_eq
+    (M : Matching V) (B : BlossomShape M) (h : M.contract B = M) :
+    (∃ P, IsAugmentingPath (M.contract B) P)
+    ↔ (∃ P, IsAugmentingPath M P) := by
+  rw [h]
+
+/-- **Empty-matching subcase.** When `M = []`, the contraction is empty too,
+    so the iff is immediate. -/
+lemma contract_matching_augmenting_iff_nil
+    (B : BlossomShape ([] : Matching V)) :
+    (∃ P, IsAugmentingPath (Matching.contract ([] : Matching V) B) P)
+    ↔ (∃ P, IsAugmentingPath ([] : Matching V) P) :=
+  contract_matching_augmenting_iff_of_contract_eq _ B (Matching.contract_nil B)
+
 /-- **Blossom-contraction equivalence.** The contracted matching admits
     an augmenting path iff the original does.
 
@@ -1668,12 +1685,18 @@ lemma Matching.mem_contract_of_outside_cycle
     blossom is handled by `Matching.mem_contract_of_outside_cycle`
     (along with similar helpers), but the case where the path enters
     the blossom requires the odd-cycle traversal argument that is the
-    heart of Edmonds' algorithm. -/
+    heart of Edmonds' algorithm. The empty / no-op cases are closed by
+    `contract_matching_augmenting_iff_nil` and
+    `contract_matching_augmenting_iff_of_contract_eq`. -/
 theorem contract_matching_augmenting_iff
     (M : Matching V) (B : BlossomShape M) :
     (∃ P, IsAugmentingPath (M.contract B) P)
     ↔ (∃ P, IsAugmentingPath M P) := by
-  sorry
+  -- Trivial subcases: M = [] or contract is a no-op.
+  by_cases h_eq : M.contract B = M
+  · exact contract_matching_augmenting_iff_of_contract_eq M B h_eq
+  · -- Non-trivial: requires Edmonds' main argument.
+    sorry
 
 /-- **Lift correctness.** Given an augmenting path in the contracted
     instance, there is a corresponding augmenting path in the original.

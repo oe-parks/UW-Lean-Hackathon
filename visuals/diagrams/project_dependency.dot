@@ -1,0 +1,110 @@
+digraph ProjectDependency {
+  rankdir=TB;
+  bgcolor="white";
+  graph [fontname="Helvetica", fontsize=12, splines=ortho, nodesep=0.4, ranksep=0.55];
+  node  [fontname="Helvetica", fontsize=11, shape=box, style="rounded,filled", margin="0.2,0.1"];
+  edge  [fontname="Helvetica", fontsize=10, color="#444444", arrowsize=0.7];
+
+  // ===== Toy graph foundation =====
+  subgraph cluster_toy {
+    label="Toy graph foundation";
+    fontsize=13;
+    style="rounded,dashed";
+    color="#4338ca";
+    node [fillcolor="#e0e7ff", color="#4338ca"];
+    TB  [label="Toy.Basic"];
+    TM  [label="Toy.Matching"];
+    TW  [label="Toy.Walk"];
+    TX  [label="Toy.Examples"];
+    TL  [label="Toy.Lemmas"];
+    TBR [label="Toy.Bridge"];
+  }
+
+  // ===== SimpleGraph matching layer =====
+  subgraph cluster_sg {
+    label="SimpleGraph matching layer";
+    fontsize=13;
+    style="rounded,dashed";
+    color="#047857";
+    node [fillcolor="#d1fae5", color="#047857"];
+    GM   [label="Graph.Matching"];
+    GA   [label="Graph.Augment"];
+    GB   [label="Graph.Berge"];
+    GW   [label="Graph.Walks"];
+    GBFS [label="Graph.BFS"];
+  }
+
+  // ===== SimpleGraph algorithms =====
+  subgraph cluster_alg {
+    label="SimpleGraph algorithms";
+    fontsize=13;
+    style="rounded,dashed";
+    color="#047857";
+    node [fillcolor="#d1fae5", color="#047857"];
+    ABP [label="Algorithms.Bipartite"];
+    ABL [label="Algorithms.Blossom"];
+  }
+
+  // ===== GraphIR runtime =====
+  subgraph cluster_irrt {
+    label="GraphIR runtime";
+    fontsize=13;
+    style="rounded,dashed";
+    color="#b45309";
+    node [fillcolor="#fef3c7", color="#b45309"];
+    IRT [label="GraphIR.Types"];
+    IRS [label="GraphIR.Syntax"];
+    IRB [label="GraphIR.Builtins"];
+    IRI [label="GraphIR.Interpreter"];
+    IRE [label="GraphIR.Examples"];
+  }
+
+  // ===== GraphIR algorithms =====
+  subgraph cluster_iral {
+    label="GraphIR algorithms";
+    fontsize=13;
+    style="rounded,dashed";
+    color="#b91c1c";
+    node [fillcolor="#fee2e2", color="#b91c1c"];
+    IRBFS [label="GraphIR.BFS"];
+    IRBL  [label="GraphIR.Blossom"];
+  }
+
+  // ===== Verification bridge =====
+  subgraph cluster_vfy {
+    label="Verification bridge";
+    fontsize=13;
+    style="rounded,dashed";
+    color="#9d174d";
+    node [fillcolor="#fce7f3", color="#9d174d"];
+    IRV [label="GraphIR.Verify"];
+    IRP [label="GraphIR.Primitives"];
+  }
+
+  // ===== Edges (imports) =====
+  TB -> TM;
+  TB -> TX;
+  TB -> TBR;
+  TB -> TL;
+  TX -> TL;
+  TM -> TW;
+
+  GM -> GA;
+  GA -> GB;
+  GB -> ABP;
+  GB -> ABL;
+  TW -> GBFS;
+
+  TW -> IRT;
+  IRT -> IRS;
+  IRS -> IRB;
+  IRB -> IRI;
+  IRI -> IRE;
+  IRE -> IRBFS;
+  IRE -> IRBL;
+
+  IRBL -> IRV;
+  GB   -> IRV;
+  TW   -> IRV;
+  IRV  -> IRP;
+}

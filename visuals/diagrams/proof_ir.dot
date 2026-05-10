@@ -1,0 +1,54 @@
+digraph ProofIR {
+  rankdir=TB;
+  bgcolor="white";
+  graph [fontname="Helvetica", fontsize=12, nodesep=0.35, ranksep=0.6];
+  node  [fontname="Helvetica", fontsize=11, shape=box, style="rounded,filled", margin="0.2,0.1"];
+  edge  [fontname="Helvetica", fontsize=10, color="#444444", arrowsize=0.7];
+
+  // Color classes
+  // proved   = green  (#c6f7c6 / #1f6f1f)
+  // sorrybox = red    (#fed7d7 / #9b1c1c)
+  // main     = yellow (#fde68a / #a16207)
+  // hypoth   = gray   (#e5e7eb / #6b7280)
+
+  MAIN [label=<<B>maxMatchingLean_isMaximum</B><BR/><FONT POINT-SIZE="10">top-level correctness</FONT>>,
+        fillcolor="#fde68a", color="#a16207", shape=box, style="rounded,filled,bold"];
+
+  B1 [label="maxMatchingLean_isMatching", fillcolor="#c6f7c6", color="#1f6f1f"];
+  B2 [label="maxMatchingLean_oracle_returns_none", fillcolor="#c6f7c6", color="#1f6f1f"];
+  B3 [label="berge (IR layer)", fillcolor="#c6f7c6", color="#1f6f1f"];
+
+  C1 [label="maxMatchingLeanCore_isMatching", fillcolor="#c6f7c6", color="#1f6f1f"];
+  C2 [label="augmentAlong_preserves_isMatching", fillcolor="#c6f7c6", color="#1f6f1f"];
+  C3 [label="toRemove_endpoints_not_in_path", fillcolor="#c6f7c6", color="#1f6f1f"];
+  C4 [label="edgesOf_* helpers", fillcolor="#c6f7c6", color="#1f6f1f"];
+
+  D1 [label="maxMatchingLeanCore_size_lb", fillcolor="#c6f7c6", color="#1f6f1f"];
+  D2 [label="augmentAlong_increases_size_by_one", fillcolor="#c6f7c6", color="#1f6f1f"];
+  D3 [label="augmentingPath_alternation_balance", fillcolor="#c6f7c6", color="#1f6f1f"];
+  D4 [label="augmentingPath_intersection_symmetry", fillcolor="#c6f7c6", color="#1f6f1f"];
+
+  HBOUND [label="hBound:  |M|·2 ≤ |V|", fillcolor="#e5e7eb", color="#6b7280", shape=note, style="filled"];
+
+  E1 [label="exists_augmenting_of_larger_ir", fillcolor="#fed7d7", color="#9b1c1c"];
+
+  // Edges
+  MAIN -> B1;
+  MAIN -> B2;
+  MAIN -> B3;
+
+  B1 -> C1;
+  C1 -> C2;
+  C2 -> C3;
+  C2 -> C4;
+
+  B2 -> D1;
+  B2 -> HBOUND [style=dashed, label="hypothesis"];
+  D1 -> D2;
+  D2 -> D3;
+  D2 -> D4;
+
+  B3 -> C2 [style=dashed, label="forward"];
+  B3 -> D2 [style=dashed, label="forward"];
+  B3 -> E1 [style=dashed, label="backward"];
+}

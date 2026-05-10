@@ -1,0 +1,26 @@
+digraph BlossomContract {
+  rankdir=TB;
+  bgcolor="white";
+  graph [fontname="Helvetica", fontsize=12, nodesep=0.35, ranksep=0.55];
+  node  [fontname="Helvetica", fontsize=11, shape=box, style="rounded,filled", margin="0.2,0.1"];
+  edge  [fontname="Helvetica", fontsize=10, color="#444444", arrowsize=0.7];
+
+  CON [label=<<B>contract_matching_augmenting_iff</B><BR/><FONT POINT-SIZE="10">Edmonds' contraction equivalence</FONT>>,
+       fillcolor="#fde68a", color="#a16207", style="rounded,filled,bold"];
+
+  H1 [label="Matching.mem_contract_iff", fillcolor="#c6f7c6", color="#1f6f1f"];
+  H2 [label="mem_contract_of_outside_cycle", fillcolor="#c6f7c6", color="#1f6f1f"];
+  H3 [label="Matching.contract_nil", fillcolor="#c6f7c6", color="#1f6f1f"];
+  H4 [label="contract_matching_augmenting_iff_of_contract_eq", fillcolor="#c6f7c6", color="#1f6f1f"];
+  H5 [label="contract_matching_augmenting_iff_nil\n(M = [] case)", fillcolor="#c6f7c6", color="#1f6f1f"];
+
+  HARD [label="odd-cycle traversal\n(Edmonds main argument, non-trivial case)",
+        fillcolor="#fed7d7", color="#9b1c1c"];
+
+  CON -> H4 [style=dashed, label="trivial: contract = M"];
+  CON -> HARD [style=dashed, label="contract ≠ M"];
+  H4 -> H5;
+  H5 -> H3;
+  H4 -> H1 [style=dotted, color="#888888"];
+  H4 -> H2 [style=dotted, color="#888888"];
+}
