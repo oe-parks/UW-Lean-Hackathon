@@ -1,4 +1,4 @@
-Formalizing Edmonds' Blossom in Lean 4
+# Formalizing Edmonds' Blossom in Lean 4
 
 Solution submitted by **Team Blossom** for the **UW Lean Hackathon 2026**.
 
